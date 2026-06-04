@@ -1,6 +1,4 @@
-import newRule from '@/functions/newRule';
-import smartNumberSpaces from '@/functions/smartNumberSpaces';
-import smartQuotes from '@/functions/smartQuotes';
+import { newRule, smartNumberSpaces, smartQuotes } from '@/functions';
 import { CHARACTERS, PUNCTUATION, WALLET } from '@/storage';
 import type { Rule } from '@/types';
 

@@ -12,5 +12,6 @@ export function greet(name = 'World'): string {
 	return `Hello ${name}`;
 }
 
-// Export types
+export { smartQuotes, smartNumberSpaces, newRule, registerRule } from '@/functions';
+export { CHARACTERS, PUNCTUATION, WALLET } from '@/storage';
 export type * from './types';

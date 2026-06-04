@@ -46,3 +46,4 @@ function newRule(
 }
 
 export default newRule;
+export { newRule };
