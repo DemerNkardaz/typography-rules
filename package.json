@@ -1,7 +1,7 @@
 {
   "name": "@yalla/typography-rules",
-  "version": "0.0.1",
-  "description": "Your package description here",
+  "version": "1.0.0",
+  "description": "Rules package for be used in typography plugins",
   "license": "MIT",
   "author": "Yalla Nkardaz",
   "repository": {

@@ -14,18 +14,16 @@ export type RegExpTransformRule = BaseRule & {
 	transform: (match: RegExpExecArray) => string;
 };
 
-// Намеренно broad-тип для функций-правил: параметры после text конкретизируются
-// в конкретных функциях (напр. smartQuotes), но для хранения в массиве Rule[]
-// и вызова через spread нужен общий знаменатель. eslint-disable-next-line покрывает
-// единственное легитимное использование any в этом файле.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RuleFunction = (text: string, ...args: any[]) => string;
-
-export type FunctionRule<T extends unknown[] = unknown[]> = BaseRule & {
+export type FunctionRule<
+	TArgs extends unknown[] = unknown[],
+	TFn extends (text: string, ...args: TArgs) => string = (text: string, ...args: TArgs) => string,
+> = BaseRule & {
 	kind: 'function';
-	rule: RuleFunction;
-	args?: T;
+	rule: TFn;
+	args?: TArgs;
 };
+
+export type RuleFunction = (text: string, ...args: never[]) => string;
 
 export type Rule = RegExpReplaceRule | RegExpTransformRule | FunctionRule;
 
