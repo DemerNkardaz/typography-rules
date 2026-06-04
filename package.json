@@ -4,6 +4,7 @@
   "description": "Rules package for be used in typography plugins",
   "license": "MIT",
   "author": "Yalla Nkardaz",
+  "keywords": [],
   "repository": {
     "type": "git",
     "url": "https://github.com/DemerNkardaz/typography-rules"
@@ -29,7 +30,7 @@
     "README.md",
     "LICENSE"
   ],
-  "keywords": [],
+  "bundleSizeLimit": 102400,
   "engines": {
     "node": ">=24.0.0"
   },
