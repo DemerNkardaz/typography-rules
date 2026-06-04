@@ -1,6 +1,10 @@
 import type { Rule } from '@/types';
 export const typographyRules: Record<string, Rule[] | undefined> = {};
 
+export function getRules() {
+	return typographyRules;
+}
+
 export function getWeightedRules(locale: string): Rule[] {
 	const common = typographyRules.common ?? [];
 	const localized = typographyRules[locale] ?? [];
