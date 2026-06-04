@@ -9,7 +9,7 @@ export function smartQuotes(
 ): string {
 	let result = '';
 	// Stack tracks which quote char opened each level: '"' or "'"
-	const stack: Array<'"' | "'"> = [];
+	const stack: ('"' | "'")[] = [];
 
 	for (let i = 0; i < text.length; i++) {
 		const char = text[i];

@@ -1,6 +1,6 @@
-export type BaseRule = {
+export interface BaseRule {
 	weight?: number;
-};
+}
 
 export type RegExpReplaceRule = BaseRule & {
 	kind: 'replace';

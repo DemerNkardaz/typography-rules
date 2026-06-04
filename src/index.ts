@@ -8,7 +8,7 @@
  * greet('World') // Returns "Hello World"
  * ```
  */
-export function greet(name: string = 'World'): string {
+export function greet(name = 'World'): string {
 	return `Hello ${name}`;
 }
 

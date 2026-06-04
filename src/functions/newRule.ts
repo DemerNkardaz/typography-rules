@@ -17,7 +17,7 @@ function newRule(rule: RuleFunction, args?: unknown[], weight?: number): Rule;
 function newRule(
 	rule: RegExp | RuleFunction,
 	second?: string | ((match: RegExpExecArray) => string) | unknown[],
-	weight: number = 0
+	weight = 0
 ): Rule {
 	if (typeof rule === 'function') {
 		return {

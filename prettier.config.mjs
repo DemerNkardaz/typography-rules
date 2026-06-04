@@ -3,8 +3,18 @@ export default {
 	tabWidth: 2,
 	semi: true,
 	singleQuote: true,
-	trailingComma: 'es5',
+	trailingComma: 'all',
 	bracketSpacing: true,
 	printWidth: 100,
 	arrowParens: 'always',
+	endOfLine: 'lf',
+
+	overrides: [
+		{
+			files: ['*.ts', '*.tsx'],
+			options: {
+				parser: 'typescript',
+			},
+		},
+	],
 };
