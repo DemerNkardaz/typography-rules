@@ -157,7 +157,7 @@ describe('typography-rules plugin', () => {
 		expect(typographyRules).toHaveProperty('common');
 		expect(typographyRules).toHaveProperty('ru');
 		expect(typographyRules).toHaveProperty('en');
-		expect(Array.isArray(typographyRules.common)).toBe(true);
+		expect(Array.isArray(typographyRules['common'])).toBe(true);
 	});
 
 	// store.ts — getRules()

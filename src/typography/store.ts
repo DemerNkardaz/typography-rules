@@ -6,7 +6,7 @@ export function getRules() {
 }
 
 export function getWeightedRules(locale: string): Rule[] {
-	const common = typographyRules.common ?? [];
+	const common = typographyRules['common'] ?? [];
 	const localized = typographyRules[locale] ?? [];
 
 	if (common.length === 0 && localized.length === 0) {

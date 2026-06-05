@@ -2,7 +2,7 @@ import { newRule, smartNumberSpaces, smartQuotes } from '@/functions';
 import { CHARACTERS, PUNCTUATION, WALLET } from '@/storage';
 import { typographyRules } from './store';
 
-typographyRules.common = [
+typographyRules['common'] = [
 	// Whitespace cleanup
 	newRule(/  +/g, ' '),
 	newRule(/^\s|\s$/g, ''),
@@ -31,7 +31,7 @@ typographyRules.common = [
 	newRule(/'/g, '\u2019', 200),
 ];
 
-typographyRules.ru = [
+typographyRules['ru'] = [
 	// 0::Разное
 	newRule(/(\d+)[\s\u00A0](%|\u2030|\u2031)/g, '$1$2'),
 	newRule(smartQuotes, [], 100),
@@ -91,7 +91,7 @@ typographyRules.ru = [
 	),
 ];
 
-typographyRules.en = [
+typographyRules['en'] = [
 	newRule(smartQuotes, [{ outer: ['“', '”'], inner: ['‘', '’'] }], 100),
 	newRule(
 		new RegExp(
