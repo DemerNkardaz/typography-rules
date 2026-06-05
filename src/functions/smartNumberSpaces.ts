@@ -1,4 +1,4 @@
-import { SPACES } from '@/unicodeStorage';
+import { SPACES } from '@/glyphs';
 import type { NumberSpaceSettings } from '@/types';
 
 export function smartNumberSpaces(

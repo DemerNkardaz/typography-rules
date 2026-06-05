@@ -9,7 +9,7 @@ import {
 	getWeightedRules,
 	resetTypographyRules,
 } from './index';
-import { SPACES } from './unicodeStorage';
+import { SPACES } from './glyphs';
 
 describe('typography-rules plugin', () => {
 	it('creates replace rules with newRule()', () => {

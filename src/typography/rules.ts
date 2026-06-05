@@ -1,10 +1,19 @@
 import { newRule, smartNumberSpaces, smartQuotes } from '@/functions';
-import { DASHES, MATHS, PUNCTUATION, SPACES, WALLET } from '@/unicodeStorage';
+import { DASHES, MATHS, PUNCTUATION, SPACES, WALLET } from '@/glyphs';
 import { typographyRules } from './store';
+import type { Rule } from '@/types';
 
-typographyRules['common'] = [
+export function applyDefaultRules(from: string): void {
+	if (defaultRules[from]) {
+		typographyRules[from] = defaultRules[from];
+	}
+}
+
+const defaultRules: Record<string, Rule[]> = {};
+
+defaultRules['common'] = [
 	// Whitespace cleanup
-	newRule(/  +/g, ' '),
+	newRule(/\s+/g, ' '),
 	newRule(/^\s|\s$/g, ''),
 
 	// Dashes and special chars
@@ -24,11 +33,11 @@ typographyRules['common'] = [
 	// Numbers
 	newRule(smartNumberSpaces, []),
 
-	// Apostrophe — runs after smartQuotes (weight 100) so only untouched ' remain
+	// Apostrophe
 	newRule(/'/g, '\u2019', 200),
 ];
 
-typographyRules['ru'] = [
+defaultRules['ru'] = [
 	// 0::Разное
 	newRule(/(\d+)[\s\u00A0](%|\u2030|\u2031)/g, '$1$2'),
 	newRule(smartQuotes, [], 100),
@@ -91,7 +100,7 @@ typographyRules['ru'] = [
 	),
 ];
 
-typographyRules['en'] = [
+defaultRules['en'] = [
 	newRule(smartQuotes, [{ outer: ['“', '”'], inner: ['‘', '’'] }], 100),
 	newRule(
 		new RegExp(
@@ -107,3 +116,6 @@ typographyRules['en'] = [
 	newRule(/ffi/g, '\uFB03'),
 	newRule(/ffl/g, '\uFB04'),
 ];
+
+export type defaultRuleKeys = keyof typeof defaultRules;
+export const defaultRuleKeys = Object.keys(defaultRules) as (keyof typeof defaultRules)[];

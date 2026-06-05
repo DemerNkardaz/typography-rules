@@ -1,7 +1,7 @@
 {
   "name": "@yalla/typography-rules",
   "version": "1.0.0",
-  "description": "Rules package for be used in typography plugins",
+  "description": "Rules package to be used in typography plugins",
   "license": "MIT",
   "author": "Yalla Nkardaz",
   "keywords": [],
@@ -22,6 +22,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
+    },
+    "./glyphs": {
+      "types": "./dist/glyphs.d.ts",
+      "import": "./dist/glyphs.mjs",
+      "require": "./dist/glyphs.cjs"
     }
   },
   "files": [
@@ -31,7 +36,7 @@
     "LICENSE"
   ],
   "bundleSizeLimit": 102400,
-  "sideEffects": true,
+  "sideEffects": false,
   "engines": {
     "node": ">=24.0.0"
   },

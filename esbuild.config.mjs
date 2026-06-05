@@ -28,6 +28,22 @@ const resultCJS = await build({ ...common, format: 'cjs', outfile: 'dist/index.c
 await writeFile('dist/meta-cjs.json', JSON.stringify(resultCJS.metafile));
 await writeFile('dist/meta-esm.json', JSON.stringify(resultMJS.metafile));
 
+const glyphsMJS = await build({
+	...common,
+	entryPoints: ['src/glyphs/index.ts'],
+	format: 'esm',
+	outfile: 'dist/glyphs.mjs',
+});
+const glyphsCJS = await build({
+	...common,
+	entryPoints: ['src/glyphs/index.ts'],
+	format: 'cjs',
+	outfile: 'dist/glyphs.cjs',
+});
+
+await writeFile('dist/glyphs-meta-cjs.json', JSON.stringify(glyphsCJS.metafile));
+await writeFile('dist/glyphs-meta-esm.json', JSON.stringify(glyphsMJS.metafile));
+
 const distFiles = readdirSync('dist').filter((f) => !f.endsWith('.map'));
 const totalSize = distFiles.reduce((sum, f) => sum + statSync(`dist/${f}`).size, 0);
 

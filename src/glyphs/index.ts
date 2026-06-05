@@ -1,4 +1,5 @@
-import type { StringMap, CharacterData, CharacterSet, AnyCharacterSet, ProtoSet } from '@/types';
+import type { StringMap, CharacterData, CharacterSet, AnyCharacterSet, ProtoSet } from './types';
+export type * from './types';
 
 const proto = {
 	join(this: StringMap, joiner = '|'): string {
@@ -109,7 +110,6 @@ export const PUNCTUATION = createCharacterSet({
 			invertedExclamation: '\u00A1', // ¡
 			invertedQuestion: '\u00BF', // ¿
 			invertedInterrobang: '\u2E18', // ⸘
-			reversedQuestion: '\u2E2E', // ⸮
 		}),
 		rightSided: createCharacters({
 			exclamation: '!',
@@ -120,6 +120,7 @@ export const PUNCTUATION = createCharacterSet({
 			doubleQuestion: '\u2047', // ⁇
 			questionExclamation: '\u2048', // ⁈
 			questionMedieval: '\u2E54', // ⹔
+			reversedQuestion: '\u2E2E', // ⸮
 			interrobang: '\u203D', // ‽
 			dot: '.',
 			comma: ',',
