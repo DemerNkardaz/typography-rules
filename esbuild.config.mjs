@@ -6,13 +6,9 @@ import { writeFile } from 'node:fs/promises';
 import pkg from './package.json' with { type: 'json' };
 const limit = pkg.bundleSizeLimit;
 
-await rm('dist', {
-	recursive: true,
-	force: true,
-});
+await rm('dist', { recursive: true, force: true });
 
 const common = {
-	entryPoints: ['src/index.ts'],
 	bundle: true,
 	treeShaking: true,
 	sourcemap: true,
@@ -21,12 +17,6 @@ const common = {
 	target: 'es2022',
 	tsconfig: 'tsconfig.build.json',
 };
-
-const resultMJS = await build({ ...common, format: 'esm', outfile: 'dist/index.mjs' });
-const resultCJS = await build({ ...common, format: 'cjs', outfile: 'dist/index.cjs' });
-
-await writeFile('dist/meta-cjs.json', JSON.stringify(resultCJS.metafile));
-await writeFile('dist/meta-esm.json', JSON.stringify(resultMJS.metafile));
 
 const glyphsMJS = await build({
 	...common,
@@ -41,8 +31,42 @@ const glyphsCJS = await build({
 	outfile: 'dist/glyphs.cjs',
 });
 
-await writeFile('dist/glyphs-meta-cjs.json', JSON.stringify(glyphsCJS.metafile));
 await writeFile('dist/glyphs-meta-esm.json', JSON.stringify(glyphsMJS.metafile));
+await writeFile('dist/glyphs-meta-cjs.json', JSON.stringify(glyphsCJS.metafile));
+
+const externalGlyphsPlugin = (format) => ({
+	name: 'external-glyphs',
+	setup(build) {
+		build.onResolve({ filter: /.*/ }, (args) => {
+			if (args.importer && args.path.includes('/glyphs')) {
+				return {
+					path: format === 'esm' ? './glyphs.mjs' : './glyphs.cjs',
+					external: true,
+				};
+			}
+		});
+	},
+});
+
+const resultMJS = await build({
+	...common,
+	entryPoints: ['src/index.ts'],
+	format: 'esm',
+	outfile: 'dist/index.mjs',
+	external: ['@yalla/typography-rules/glyphs'],
+	plugins: [externalGlyphsPlugin('esm')],
+});
+const resultCJS = await build({
+	...common,
+	entryPoints: ['src/index.ts'],
+	format: 'cjs',
+	outfile: 'dist/index.cjs',
+	external: ['@yalla/typography-rules/glyphs'],
+	plugins: [externalGlyphsPlugin('cjs')],
+});
+
+await writeFile('dist/meta-esm.json', JSON.stringify(resultMJS.metafile));
+await writeFile('dist/meta-cjs.json', JSON.stringify(resultCJS.metafile));
 
 const distFiles = readdirSync('dist').filter((f) => !f.endsWith('.map'));
 const totalSize = distFiles.reduce((sum, f) => sum + statSync(`dist/${f}`).size, 0);
