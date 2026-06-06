@@ -4,7 +4,13 @@
   "description": "Rules package to be used in typography plugins",
   "license": "MIT",
   "author": "Yalla Nkardaz",
-  "keywords": [],
+  "keywords": [
+    "typography",
+    "typographic",
+    "text",
+    "russian",
+    "english"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/DemerNkardaz/typography-rules"
@@ -46,9 +52,10 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "generate": "node tools/generate-sets-index.mjs",
     "build:js": "node esbuild.config.mjs",
     "build:types": "tsc --project tsconfig.build.json --emitDeclarationOnly",
-    "build": "npm run build:js && npm run build:types",
+    "build": "npm run generate && npm run build:js && npm run build:types",
     "dev": "esbuild --watch",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
@@ -57,12 +64,12 @@
     "test": "vitest --run",
     "test:coverage": "vitest --run --coverage",
     "test:ui": "vitest --ui",
-    "prepublishOnly": "npm run build && npm run lint && npm run type-check",
+    "prepublishOnly": "npm run generate && npm run build && npm run lint && npm run type-check",
     "knip": "knip"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "@vitest/coverage-v8": "^4.1.8",
     "esbuild": "^0.28.0",
     "eslint": "^10.4.1",

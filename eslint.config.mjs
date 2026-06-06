@@ -34,7 +34,7 @@ export default tseslint.config(
 	},
 
 	{
-		files: ['*.config.mjs', '*.config.ts'],
+		files: ['*.config.mjs', '*.config.ts', '**/tools/*.mjs'],
 		languageOptions: {
 			globals: {
 				console: 'readonly',
