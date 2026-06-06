@@ -5,7 +5,6 @@ import {
 	smartQuotes,
 	smartNumberSpaces,
 	typographyRules,
-	getRules,
 	getWeightedRules,
 	resetTypographyRules,
 	applyDefaultRules,
@@ -196,10 +195,6 @@ describe('typographyRules store', () => {
 		expect(typographyRules).toHaveProperty('ru');
 		expect(typographyRules).toHaveProperty('en');
 		expect(Array.isArray(typographyRules['common'])).toBe(true);
-	});
-
-	it('getRules() returns the same object reference', () => {
-		expect(getRules()).toBe(typographyRules);
 	});
 
 	it('getWeightedRules sorts by weight ascending', () => {

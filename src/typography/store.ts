@@ -15,16 +15,6 @@ import type { Rule } from '@/types';
 export const typographyRules: Record<string, Rule[] | undefined> = { common: [] };
 
 /**
- * Returns the raw typography rule registry.
- *
- * This exposes the internal mutable rule store.
- * Intended for debugging or advanced pipeline inspection.
- */
-export function getRules() {
-	return typographyRules;
-}
-
-/**
  * Returns a merged and weight-sorted rule pipeline.
  *
  * Combines:
@@ -74,4 +64,24 @@ export function resetTypographyRules(): void {
 	for (const key in typographyRules) {
 		typographyRules[key] = [];
 	}
+}
+
+/**
+ * Checks if a locale-specific rule pipeline exists.
+ *
+ * @param locale - Target locale key
+ * @returns `true` if pipeline exists, `false` otherwise
+ */
+export function rulesHas(locale: string): boolean {
+	return !!typographyRules[locale];
+}
+
+/**
+ * Returns the number of rules in a locale-specific rule pipeline.
+ *
+ * @param locale - Target locale key
+ * @returns Number of rules in the pipeline
+ */
+export function rulesCount(locale: string): number {
+	return typographyRules[locale]?.length ?? 0;
 }

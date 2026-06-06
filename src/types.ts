@@ -57,7 +57,7 @@ export type FunctionRule<
 > = BaseRule & {
 	kind: 'function';
 	rule: TFn;
-	args?: TArgs;
+	args: TArgs;
 };
 
 /**

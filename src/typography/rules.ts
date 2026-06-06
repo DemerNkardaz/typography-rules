@@ -56,7 +56,7 @@ defaultRules['common'] = [
 	newRule(/--/g, DASHES.em),
 	newRule(/\.\.\./g, PUNCTUATION.common.rightSided.ellipsis),
 
-	newRule(smartNumberSpaces, [{ spaceCharacter: 'sfsa' }]),
+	newRule(smartNumberSpaces),
 	newRule(/'/g, PUNCTUATION.common.generic.apostrophe, 200),
 ];
 
