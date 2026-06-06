@@ -1,5 +1,8 @@
 import type { Rule } from '@/types';
 
+const _rules: Record<string, Rule[] | undefined> = { common: [] };
+const _cache = new Map<string, Rule[]>();
+
 /**
  * Global typography rule registry.
  *
@@ -11,8 +14,18 @@ import type { Rule } from '@/types';
  *
  * Each entry contains a list of transformation rules
  * executed during typography processing.
+ *
+ * Direct assignment (e.g. typographyRules['en'] = [...]) automatically
+ * invalidates the weighted rules cache for the affected locale.
  */
-export const typographyRules: Record<string, Rule[] | undefined> = { common: [] };
+export const typographyRules: Record<string, Rule[] | undefined> = new Proxy(_rules, {
+	set(target, locale: string, value: Rule[] | undefined) {
+		target[locale] = value;
+		_cache.delete(locale);
+		if (locale !== 'common') _cache.delete('common');
+		return true;
+	},
+});
 
 /**
  * Returns a merged and weight-sorted rule pipeline.
@@ -20,6 +33,9 @@ export const typographyRules: Record<string, Rule[] | undefined> = { common: [] 
  * Combines:
  * - common rules
  * - locale-specific rules
+ *
+ * Result is cached per locale and invalidated automatically
+ * when rules are registered or reset for that locale.
  *
  * Sorting:
  * - rules are ordered by `weight` (ascending)
@@ -30,23 +46,21 @@ export const typographyRules: Record<string, Rule[] | undefined> = { common: [] 
  * @returns Flattened and sorted rule pipeline
  */
 export function getWeightedRules(locale: string): Rule[] {
-	const common = typographyRules['common'] ?? [];
-	const localized = typographyRules[locale] ?? [];
+	if (_cache.has(locale)) return _cache.get(locale)!;
 
-	if (common.length === 0 && localized.length === 0) {
-		return [];
-	}
+	const common = _rules['common'] ?? [];
+	const localized = _rules[locale] ?? [];
 
-	return [...common, ...localized].sort((a, b) => {
+	if (common.length === 0 && localized.length === 0) return [];
+
+	const result = [...common, ...localized].sort((a, b) => {
 		const weightA = a.weight ?? 0;
 		const weightB = b.weight ?? 0;
-
-		if (weightA !== weightB) {
-			return weightA - weightB;
-		}
-
-		return 0;
+		return weightA !== weightB ? weightA - weightB : 0;
 	});
+
+	_cache.set(locale, result);
+	return result;
 }
 
 /**
@@ -61,19 +75,20 @@ export function getWeightedRules(locale: string): Rule[] {
  * - dynamic rule reloading
  */
 export function resetTypographyRules(): void {
-	for (const key in typographyRules) {
-		typographyRules[key] = [];
+	for (const key in _rules) {
+		_rules[key] = [];
 	}
+	_cache.clear();
 }
 
 /**
  * Checks if a locale-specific rule pipeline exists.
  *
  * @param locale - Target locale key
- * @returns `true` if pipeline exists, `false` otherwise
+ * @returns `true` if pipeline exists and non-empty, `false` otherwise
  */
 export function rulesHas(locale: string): boolean {
-	return !!typographyRules[locale];
+	return !!_rules[locale];
 }
 
 /**
@@ -83,5 +98,5 @@ export function rulesHas(locale: string): boolean {
  * @returns Number of rules in the pipeline
  */
 export function rulesCount(locale: string): number {
-	return typographyRules[locale]?.length ?? 0;
+	return _rules[locale]?.length ?? 0;
 }

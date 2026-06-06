@@ -1,3 +1,7 @@
+import type { PatternProto, PatternData, PatternSet } from './types';
+
+export type * from './types';
+
 /**
  * Private Use Area (PUA) marker sequence used to identify AST nodes.
  *
@@ -34,6 +38,68 @@ export const NODE_MARKER_REGEX = new RegExp(NODE_MARKER, 'g');
  */
 export const PROTECTION_MARKER_REGEX = new RegExp(PROTECTION_MARKER, 'g');
 
+const patternProto: PatternProto = {
+	get values(): RegExp[] {
+		return Object.keys(this)
+			.map((key) => {
+				const desc = Object.getOwnPropertyDescriptor(this, key);
+				return desc?.get
+					? ((this as unknown as Record<string, unknown>)[key] as RegExp)
+					: undefined;
+			})
+			.filter((v): v is RegExp => v !== undefined);
+	},
+
+	*[Symbol.iterator](): Iterator<RegExp> {
+		for (const key of Object.keys(this)) {
+			const desc = Object.getOwnPropertyDescriptor(this, key);
+			if (desc?.get) yield (this as unknown as Record<string, unknown>)[key] as RegExp;
+		}
+	},
+};
+
+/**
+ * Creates a pattern registry from a map of named RegExp patterns.
+ *
+ * Each pattern is stored as a getter that returns a new `RegExp` instance
+ * on every access, ensuring `lastIndex` is always reset to `0` regardless
+ * of how the pattern was previously used.
+ *
+ * Prototype methods (`values`, `Symbol.iterator`) are attached via
+ * `Object.create` and do not appear as enumerable keys on the result.
+ *
+ * @template T - Shape of the source pattern map
+ * @param patterns - Raw map of named RegExp patterns
+ * @returns A pattern registry with per-access instantiation and prototype utilities
+ *
+ * @example
+ * const PATTERNS = createPatterns({
+ *   email: /[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+/g,
+ *   url: /https?:\/\/[^\s]+/g,
+ * });
+ *
+ * PATTERNS.email.test('user@example.com'); // always starts from lastIndex = 0
+ * [...PATTERNS];                           // [RegExp, RegExp]
+ * PATTERNS.values;                         // [RegExp, RegExp]
+ */
+export function createPatterns<T extends PatternData>(patterns: T): PatternSet<T> {
+	const result = Object.create(patternProto) as PatternSet<T>;
+
+	for (const key of Object.keys(patterns) as (keyof T & string)[]) {
+		const src = patterns[key]!.source;
+		const flags = patterns[key]!.flags;
+		Object.defineProperty(result, key, {
+			get(): RegExp {
+				return new RegExp(src, flags);
+			},
+			enumerable: true,
+			configurable: true,
+		});
+	}
+
+	return result;
+}
+
 /**
  * Registry of protected regex patterns used in text preprocessing.
  *
@@ -52,7 +118,7 @@ export const PROTECTION_MARKER_REGEX = new RegExp(PROTECTION_MARKER, 'g');
  * This system ensures that structured technical content
  * is not corrupted by typographic transformations.
  */
-export const PROTECTED_PATTERNS = {
+export const PROTECTED_PATTERNS = createPatterns({
 	email: /[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+/g,
 	url: /https?:\/\/[^\s]+/g,
 	unixPath: /\/[a-zA-Z0-9._\-/]+\.[a-zA-Z0-9]+/g,
@@ -65,43 +131,11 @@ export const PROTECTED_PATTERNS = {
 	ipv4: /\b(?:\d{1,3}\.){3}\d{1,3}\b/g,
 	ipv6: /\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b/g,
 	mac: /\b(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}\b/g,
+	version: /\bv?\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?\b/g,
 	selector: /[.#][A-Za-z_][\w-]*/g,
 	cliOption: /--?[a-zA-Z][\w-]*/g, //
-	version: /\bv?\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?\b/g,
 	isbn: /\b(?:97[89][- ]?)?(?:\d[- ]?){9}[\dX]\b/g,
 	issn: /\b\d{4}-\d{3}[\dX]\b/g,
 	doi: /\b10\.\d{4,9}\/[-._;()/:A-Z0-9]+\b/gi,
 	orcid: /\b\d{4}-\d{4}-\d{4}-\d{3}[\dX]\b/g,
-
-	/**
-	 * Returns all RegExp patterns from the protection registry.
-	 *
-	 * Filters out computed properties and non-RegExp entries.
-	 * Used when applying batch protection in preprocessing pipelines.
-	 */
-	get values(): RegExp[] {
-		return (Object.keys(this) as (keyof typeof PROTECTED_PATTERNS)[])
-			.filter((key) => {
-				const desc = Object.getOwnPropertyDescriptor(this, key);
-				return desc?.value instanceof RegExp;
-			})
-			.map((key) => this[key] as RegExp);
-	},
-
-	/**
-	 * Iterator over all RegExp patterns in the protection registry.
-	 *
-	 * Enables usage in:
-	 * for..of loops, spreading, and pipeline-based processing.
-	 *
-	 * Only yields valid RegExp entries, excluding computed properties.
-	 */
-	*[Symbol.iterator]() {
-		for (const key of Object.keys(this) as (keyof typeof PROTECTED_PATTERNS)[]) {
-			const desc = Object.getOwnPropertyDescriptor(this, key);
-			if (desc?.value instanceof RegExp) {
-				yield this[key];
-			}
-		}
-	},
-} as const;
+});

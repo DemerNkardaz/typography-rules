@@ -1,5 +1,7 @@
 import type { GlyphStringMap, GlyphData, GlyphSet, GlyphSetInterface, ProtoSet } from './types';
 
+export type * from './types';
+
 const proto = {
 	join(this: GlyphStringMap, joiner = '|'): string {
 		return Object.values(this).join(joiner);
@@ -540,8 +542,6 @@ export const WALLET = createCharacters({
 	bnb: 'BNB',
 	usdc: 'USDC',
 } as const);
-
-export type * from './types';
 
 // Glyph Types
 

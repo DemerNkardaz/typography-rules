@@ -4,6 +4,9 @@ import { typographyRules } from '@/typography/store';
 /**
  * Registers one or more typography rules for a locale.
  *
+ * Automatically invalidates the weighted rules cache
+ * for the affected locale and "common".
+ *
  * @param locale Locale code (e.g. "en", "de", "fr").
  * @param rules A single rule or rules[].
  */
@@ -15,11 +18,16 @@ function registerRule(locale: string, rules: Rule | Rule[]): void {
 		typographyRules[locale] = [];
 	}
 
+	const target = typographyRules[locale]!;
+
 	if (Array.isArray(rules)) {
-		typographyRules[locale].push(...rules);
+		target.push(...rules);
 	} else {
-		typographyRules[locale].push(rules);
+		target.push(rules);
 	}
+
+	// Reassign to trigger Proxy setter and invalidate cache
+	typographyRules[locale] = target;
 }
 
 export { registerRule };
