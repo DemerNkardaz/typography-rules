@@ -13,7 +13,7 @@ export type PatternData = Record<string, RegExp>;
  * that returns a fresh `RegExp` instance on every access, preventing
  * `lastIndex` pollution from the `g` flag across multiple calls.
  *
- * @template T - Shape of the source pattern map
+ * @template T — Shape of the source pattern map
  */
 export type PatternSet<T extends PatternData> = {
 	readonly [K in keyof T]: RegExp;
@@ -37,7 +37,7 @@ export type PatternSet<T extends PatternData> = {
 		 * Prefer this over iterating `.values` with sequential `.replace()` calls —
 		 * a single combined pass prevents one pattern from corrupting input for another.
 		 *
-		 * @param flags - RegExp flags for the combined pattern (default: `'g'`)
+		 * @param flags — RegExp flags for the combined pattern (default: `'g'`)
 		 */
 		combined(flags?: string): RegExp;
 
@@ -48,7 +48,7 @@ export type PatternSet<T extends PatternData> = {
 		 * on every access, ensuring `lastIndex` is always reset to `0` regardless
 		 * of how the pattern was previously used.
 		 *
-		 * @param patterns - Raw map of named RegExp patterns
+		 * @param patterns — Raw map of named RegExp patterns
 		 */
 		insert(patterns: PatternData): void;
 

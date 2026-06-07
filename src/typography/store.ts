@@ -9,8 +9,8 @@ const _cache = new Map<string, Rule[]>();
  * Stores rule pipelines grouped by locale key.
  *
  * Structure:
- * - "common": rules applied to all locales
- * - "[locale]": locale-specific rule overrides
+ * — "common": rules applied to all locales
+ * — "[locale]": locale-specific rule overrides
  *
  * Each entry contains a list of transformation rules
  * executed during typography processing.
@@ -31,18 +31,18 @@ export const typographyRules: Record<string, Rule[] | undefined> = new Proxy(_ru
  * Returns a merged and weight-sorted rule pipeline.
  *
  * Combines:
- * - common rules
- * - locale-specific rules
+ * — common rules
+ * — locale-specific rules
  *
  * Result is cached per locale and invalidated automatically
  * when rules are registered or reset for that locale.
  *
  * Sorting:
- * - rules are ordered by `weight` (ascending)
- * - rules without weight default to 0
- * - stable order is preserved for equal weights
+ * — rules are ordered by `weight` (ascending)
+ * — rules without weight default to 0
+ * — stable order is preserved for equal weights
  *
- * @param locale - Target locale key
+ * @param locale — Target locale key
  * @returns Flattened and sorted rule pipeline
  */
 export function getWeightedRules(locale: string): Rule[] {
@@ -70,9 +70,9 @@ export function getWeightedRules(locale: string): Rule[] {
  * After reset, all rule groups become empty arrays.
  *
  * Useful for:
- * - testing
- * - reinitialization
- * - dynamic rule reloading
+ * — testing
+ * — reinitialization
+ * — dynamic rule reloading
  */
 export function resetTypographyRules(): void {
 	for (const key in _rules) {
@@ -84,7 +84,7 @@ export function resetTypographyRules(): void {
 /**
  * Checks if a locale-specific rule pipeline exists.
  *
- * @param locale - Target locale key
+ * @param locale — Target locale key
  * @returns `true` if pipeline exists and non-empty, `false` otherwise
  */
 export function rulesHas(locale: string): boolean {
@@ -94,7 +94,7 @@ export function rulesHas(locale: string): boolean {
 /**
  * Returns the number of rules in a locale-specific rule pipeline.
  *
- * @param locale - Target locale key
+ * @param locale — Target locale key
  * @returns Number of rules in the pipeline
  */
 export function rulesCount(locale: string): number {

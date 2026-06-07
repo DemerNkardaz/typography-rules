@@ -11,8 +11,8 @@ import type { NumberSpaceSettings } from '@/types';
  * @param text Input text that may contain numbers.
  *
  * @param settings Formatting options:
- * - `minLength` — minimum integer length before spacing is applied (default: 5)
- * - `separateFloat` — whether to insert spacing inside fractional part groups
+ * — `minLength` — minimum integer length before spacing is applied (default: 5)
+ * — `separateFloat` — whether to insert spacing inside fractional part groups
  *
  * @returns Text with formatted numbers containing non-breaking spaces.
  *
@@ -26,11 +26,7 @@ import type { NumberSpaceSettings } from '@/types';
  */
 export function smartNumberSpaces(
 	text: string,
-	{
-		minLength = 5,
-		separateFloat = false,
-		spaceCharacter = SPACES.noBreak,
-	}: NumberSpaceSettings = {}
+	{ minLength = 5, separateFloat = false, separator = SPACES.noBreak }: NumberSpaceSettings = {}
 ): string {
 	return text.replace(
 		/(?<![a-zA-Zа-яА-ЯёЁ\d])([+\-\u2212]?)(\d[\d\u00A0]*)([.,]\d+)?(?!\d)/g,
@@ -39,13 +35,13 @@ export function smartNumberSpaces(
 
 			if (intPart.length < minLength) return match;
 
-			const formattedInt = intPart.replace(/(\d)(?=(\d{3})+$)/g, `$1${spaceCharacter}`);
+			const formattedInt = intPart.replace(/(\d)(?=(\d{3})+$)/g, `$1${separator}`);
 
 			let formattedFloat = floatPart ?? '';
 			if (separateFloat && floatPart) {
 				const sep = floatPart[0]; // '.' OR ','
 				const digits = floatPart.slice(1);
-				const spaced = digits.replace(/(\d{3})(?=\d)/g, `$1${spaceCharacter}`);
+				const spaced = digits.replace(/(\d{3})(?=\d)/g, `$1${separator}`);
 				formattedFloat = sep + spaced;
 			}
 

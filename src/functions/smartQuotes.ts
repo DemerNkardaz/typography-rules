@@ -8,14 +8,14 @@ import type { QuoteSettings } from '@/types';
  * opening/closing quotes based on nesting context and surrounding characters.
  *
  * Supports:
- * - Outer and inner quote levels
- * - Nested quotation handling
- * - Apostrophe detection for contractions (e.g. don't, it's)
+ * — Outer and inner quote levels
+ * — Nested quotation handling
+ * — Apostrophe detection for contractions (e.g. don't, it's)
  *
- * @param text - Input string containing raw quotes.
- * @param quotes - Quote configuration for outer and inner levels.
- * @param quotes.outer - Pair of outer quotes: [open, close]
- * @param quotes.inner - Pair of inner quotes: [open, close]
+ * @param text — Input string containing raw quotes.
+ * @param quotes — Quote configuration for outer and inner levels.
+ * @param quotes.outer — Pair of outer quotes: [open, close]
+ * @param quotes.inner — Pair of inner quotes: [open, close]
  *
  * @returns String with typographically corrected quotes.
  *

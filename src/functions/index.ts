@@ -1,4 +1,6 @@
-export { newRule } from './newRule';
-export { registerRule } from './registerRule';
-export { smartNumberSpaces } from './smartNumberSpaces';
-export { smartQuotes } from './smartQuotes';
+export * from './newRule';
+export * from './registerRule';
+export * from './smartNumberSpaces';
+export * from './smartQuotes';
+export * from './clearSpaces';
+export * from './paragraph';

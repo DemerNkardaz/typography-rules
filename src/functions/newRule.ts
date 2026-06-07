@@ -18,21 +18,21 @@ import type {
  * The resulting rule is later used in typography pipelines
  * to transform text based on matching patterns.
  *
- * @param rule - Rule definition:
- *  - RegExp for replace/transform rules
- *  - Function for function-based rules
+ * @param rule — Rule definition:
+ *  — RegExp for replace/transform rules
+ *  — Function for function-based rules
  *
- * @param second - Either:
- *  - replacement string (for replace rule)
- *  - transform function (for transform rule)
- *  - arguments array (for function rule)
+ * @param second — Either:
+ *  — replacement string (for replace rule)
+ *  — transform function (for transform rule)
+ *  — arguments array (for function rule)
  *
- * @param weight - Priority of the rule (higher = applied later or earlier depending on engine)
+ * @param weight — Priority of the rule (higher = applied later or earlier depending on engine)
  *
  * @returns A normalized Rule object:
- *  - `RegExpReplaceRule` if replacement string is provided
- *  - `RegExpTransformRule` if transform function is provided
- *  - `FunctionRule` if rule is a function
+ *  — `RegExpReplaceRule` if replacement string is provided
+ *  — `RegExpTransformRule` if transform function is provided
+ *  — `FunctionRule` if rule is a function
  *
  * @example
  * // Replace rule

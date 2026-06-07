@@ -72,9 +72,9 @@ export type RuleFunction = (text: string, ...args: never[]) => string;
  * Union type representing all available typography rule variants.
  *
  * Includes:
- * - RegExp-based replacement rules
- * - RegExp-based transform rules
- * - Function-based rules
+ * — RegExp-based replacement rules
+ * — RegExp-based transform rules
+ * — Function-based rules
  */
 export type Rule = RegExpReplaceRule | RegExpTransformRule | FunctionRule;
 
@@ -85,8 +85,8 @@ export type Rule = RegExpReplaceRule | RegExpTransformRule | FunctionRule;
  *
  * Defines outer and inner quotation marks used during nesting.
  *
- * @property outer - Primary quote pair [opening, closing]
- * @property inner - Nested quote pair [opening, closing]
+ * @property outer — Primary quote pair [opening, closing]
+ * @property inner — Nested quote pair [opening, closing]
  */
 export interface QuoteSettings {
 	outer?: [string, string];
@@ -98,12 +98,32 @@ export interface QuoteSettings {
  *
  * Controls how spacing is applied inside numeric expressions.
  *
- * @property minLength - Minimum digit length required to apply spacing
- * @property separateFloat - Whether to format fractional parts separately
- * @property spaceCharacter - Character used as a spacing separator
+ * @property minLength — Minimum digit length required to apply spacing
+ * @property separateFloat — Whether to format fractional parts separately
+ * @property spaceCharacter — Character used as a spacing separator
  */
 export interface NumberSpaceSettings {
 	minLength?: number;
 	separateFloat?: boolean;
-	spaceCharacter?: Spaces;
+	separator?: Spaces | string;
+}
+
+/**
+ * Configuration for space removal rules.
+ *
+ * @property spaces — Array of space characters to remove
+ */
+export interface ClearSpacesSettings {
+	spaces?: Spaces[] | string[];
+}
+
+/**
+ * Configuration for runt handling.
+ *
+ * @property threshold — Threshold value for runt detection
+ * @property space — Space character used for runt replacement
+ */
+export interface runtSettings {
+	threshold?: number;
+	space?: Spaces | string;
 }

@@ -89,8 +89,8 @@ const patternProto: PatternProto = {
  * Prototype methods (`values`, `Symbol.iterator`) are attached via
  * `Object.create` and do not appear as enumerable keys on the result.
  *
- * @template T - Shape of the source pattern map
- * @param patterns - Raw map of named RegExp patterns
+ * @template T — Shape of the source pattern map
+ * @param patterns — Raw map of named RegExp patterns
  * @returns A pattern registry with per-access instantiation and prototype utilities
  *
  * @example
@@ -128,13 +128,13 @@ export function createPatterns<T extends PatternData>(patterns: T): PatternSet<T
  * by wrapping matches with protection markers.
  *
  * Includes:
- * - URLs and emails
- * - filesystem paths (Unix / Windows)
- * - code blocks and inline code
- * - identifiers (UUID, hashes, ORCID, DOI)
- * - network addresses (IPv4, IPv6, MAC)
- * - programming-related syntax (selectors, CLI flags, versions)
- * - publishing identifiers (ISBN, ISSN)
+ * — URLs and emails
+ * — filesystem paths (Unix / Windows)
+ * — code blocks and inline code
+ * — identifiers (UUID, hashes, ORCID, DOI)
+ * — network addresses (IPv4, IPv6, MAC)
+ * — programming-related syntax (selectors, CLI flags, versions)
+ * — publishing identifiers (ISBN, ISSN)
  *
  * This system ensures that structured technical content
  * is not corrupted by typographic transformations.

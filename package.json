@@ -1,7 +1,7 @@
 {
   "name": "@yalla/typography-rules",
   "version": "1.0.0",
-  "description": "Rules package to be used in typography plugins",
+  "description": "Rules package to be used in typography plugins. Glyphs library and helpers included.",
   "license": "MIT",
   "author": "Yalla Nkardaz",
   "keywords": [

@@ -10,16 +10,16 @@ import * as sets from './sets';
  * applied during text normalization and typographic processing.
  *
  * Structure:
- * - common: rules applied to all locales
- * - ru: Russian-specific typography rules
- * - en: English-specific typography rules
+ * — common: rules applied to all locales
+ * — ru: Russian-specific typography rules
+ * — en: English-specific typography rules
  *
  * Rules include:
- * - whitespace normalization
- * - dash and punctuation correction
- * - smart quotes processing
- * - currency spacing rules
- * - ligature substitution
+ * — whitespace normalization
+ * — dash and punctuation correction
+ * — smart quotes processing
+ * — currency spacing rules
+ * — ligature substitution
  */
 const defaultRules: Record<string, Rule[]> = {};
 
@@ -43,15 +43,15 @@ export const defaultRuleKeys = Object.keys(defaultRules) as (keyof typeof defaul
  * Applies default typography rules to the global typography registry.
  *
  * If no locale is specified:
- * - all rule groups are applied
+ * — all rule groups are applied
  *
  * If locale is specified:
- * - only that group is applied
+ * — only that group is applied
  *
  * This function initializes the typography pipeline
  * before processing text transformations.
  *
- * @param from - Optional locale key to apply specific rule group
+ * @param from — Optional locale key to apply specific rule group
  */
 export function applyDefaultRules(from?: string): void {
 	if (!from) {

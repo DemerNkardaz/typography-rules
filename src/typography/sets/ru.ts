@@ -1,20 +1,24 @@
-import { newRule, smartQuotes } from '@/functions';
+import { newRule, smartNumberSpaces, smartQuotes } from '@/functions';
 import { PUNCTUATION, WALLET, SPACES, DASHES } from '@/glyphs';
 
 /**
  * Russian typography ruleset.
  *
  * Extends common rules with:
- * - Russian-style smart quotes
- * - spacing normalization for punctuation
- * - em-dash formatting rules
- * - currency formatting (RUB and others)
- * - abbreviation spacing rules
- * - grammatical particle spacing rules
+ * — Russian-style smart quotes
+ * — spacing normalization for punctuation
+ * — em-dash formatting rules
+ * — currency formatting (RUB and others)
+ * — abbreviation spacing rules
+ * — grammatical particle spacing rules
  *
  * Designed for Cyrillic text normalization.
  */
 export default [
+	// Adds a non-breaking space as a thousands separator, e.g. 1 234 567
+	// Добавляет неразрывный пробел в качестве разделителя разрядов чисел
+	newRule(smartNumberSpaces, [{ separator: SPACES.noBreak }]),
+
 	// 0::Разное
 	newRule(/(\d+)[\s\u00A0](%|\u2030|\u2031)/g, '$1$2'),
 	newRule(

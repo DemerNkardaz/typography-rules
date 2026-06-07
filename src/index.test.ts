@@ -12,7 +12,15 @@ import {
 	rulesCount,
 } from './index';
 import { SPACES, createCharacters, createCharacterSet } from './glyphs';
-import { createPatterns, joinNodes, NODE_MARKER, protect, PROTECTED_PATTERNS, splitNodes, unprotect } from './helpers';
+import {
+	createPatterns,
+	joinNodes,
+	NODE_MARKER,
+	protect,
+	PROTECTED_PATTERNS,
+	splitNodes,
+	unprotect,
+} from './helpers';
 
 applyDefaultRules();
 
@@ -427,19 +435,19 @@ describe('GlyphSet proto methods', () => {
 
 	it('find() returns key for known value', () => {
 		const chars = createCharacters({ em: '—', en: '–' } as const);
-		expect(chars.find('—')).toBe('em');
-		expect(chars.find('–')).toBe('en');
+		expect(chars.findKey('—')).toBe('em');
+		expect(chars.findKey('–')).toBe('en');
 	});
 
 	it('find() returns undefined for unknown value', () => {
 		const chars = createCharacters({ em: '—' } as const);
-		expect(chars.find('???')).toBeUndefined();
+		expect(chars.findKey('???')).toBeUndefined();
 	});
 
 	it('find() works after insert()', () => {
 		const chars = createCharacters({ a: 'A' } as const);
 		chars.insert({ b: 'B' });
-		expect(chars.find('B')).toBe('b');
+		expect(chars.findKey('B')).toBe('b');
 	});
 });
 
