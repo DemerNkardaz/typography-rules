@@ -1,4 +1,5 @@
-import { newRule, smartNumberGrouping, smartQuotes } from '@/functions';
+import { newRule } from '@/api';
+import { smartNumberGrouping, smartQuotes } from '@/functions';
 import { PUNCTUATION, LIGATURES } from '@/glyphs';
 
 /**

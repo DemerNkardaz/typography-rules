@@ -1,4 +1,5 @@
-import { clearSpaces, newRule, runt } from '@/functions';
+import { newRule } from '@/api';
+import { clearSpaces, runt } from '@/functions';
 import { MATHS, DASHES, PUNCTUATION, RANGES } from '@/glyphs';
 
 const RAW = {

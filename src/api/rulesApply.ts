@@ -1,7 +1,7 @@
-import { typographyRules } from './store';
+import { typographyRules } from '@/typography/store';
 import type { Rule } from '@/types';
 
-import * as sets from './sets';
+import * as sets from '@/typography/sets';
 
 /**
  * Default typography transformation rules grouped by locale.

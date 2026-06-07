@@ -1,15 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import {
-	newRule,
-	registerRule,
-	smartQuotes,
-	smartNumberGrouping,
 	typographyRules,
 	getWeightedRules,
 	resetTypographyRules,
 	applyDefaultRules,
 	rulesHas,
 	rulesCount,
+	newRule,
+	registerRule,
 } from './index';
 import { SPACES, createCharacters, createCharacterSet } from './glyphs';
 import {
@@ -21,16 +19,18 @@ import {
 	splitNodes,
 	unprotect,
 } from './helpers';
+import { smartQuotes, smartNumberGrouping } from './functions';
 
 applyDefaultRules();
 
 // ─────────────────────────────────────────────
 // newRule
 // ─────────────────────────────────────────────
-describe('newRule()', () => {
+describe('newRule', () => {
 	it('creates replace rule', () => {
-		const rule = newRule(/foo/g, 'bar', 5);
+		const rule = newRule('/test', /foo/g, 'bar', 5);
 		expect(rule).toEqual({
+			label: '/test',
 			kind: 'replace',
 			rule: expect.any(RegExp),
 			replacement: 'bar',
@@ -40,7 +40,7 @@ describe('newRule()', () => {
 	});
 
 	it('creates transform rule', () => {
-		const rule = newRule(/(\d+)/g, (match) => `#${match[1]}`);
+		const rule = newRule('/test', /(\d+)/g, (match) => `#${match[1]}`);
 		expect(rule.kind).toBe('transform');
 		if (rule.kind === 'transform') {
 			const match = rule.rule.exec('123');
@@ -50,7 +50,7 @@ describe('newRule()', () => {
 	});
 
 	it('creates function rule with args and weight', () => {
-		const rule = newRule(smartQuotes, [{ outer: ['«', '»'], inner: ['‹', '›'] }], 10);
+		const rule = newRule('/test', smartQuotes, [{ outer: ['«', '»'], inner: ['‹', '›'] }], 10);
 		expect(rule.kind).toBe('function');
 		if (rule.kind === 'function') {
 			expect(rule.rule).toBe(smartQuotes);
@@ -60,7 +60,7 @@ describe('newRule()', () => {
 	});
 
 	it('creates function rule with default empty args and weight=0', () => {
-		const rule = newRule(smartQuotes);
+		const rule = newRule('/test', smartQuotes);
 		expect(rule.kind).toBe('function');
 		if (rule.kind === 'function') {
 			expect(rule.args).toEqual([]);
@@ -75,15 +75,15 @@ describe('newRule()', () => {
 describe('registerRule()', () => {
 	it('adds a single rule to a new locale', () => {
 		const locale = `test-locale-${Date.now()}`;
-		const rule = newRule(/test/g, 'ok');
+		const rule = newRule('/test', /test/g, 'ok');
 		registerRule(locale, rule);
 		expect(typographyRules[locale]).toContain(rule);
 	});
 
 	it('appends to existing locale array', () => {
 		const locale = `test-locale-append-${Date.now()}`;
-		const rule1 = newRule(/a/g, 'b');
-		const rule2 = newRule(/c/g, 'd');
+		const rule1 = newRule('/test', /a/g, 'b');
+		const rule2 = newRule('/test', /c/g, 'd');
 		registerRule(locale, rule1);
 		registerRule(locale, rule2);
 		expect(typographyRules[locale]).toHaveLength(2);
@@ -92,7 +92,11 @@ describe('registerRule()', () => {
 	// registerRule.ts line 13 — passing an array of rules
 	it('registers an array of rules at once', () => {
 		const locale = `test-locale-array-${Date.now()}`;
-		const rules = [newRule(/x/g, 'X'), newRule(/y/g, 'Y'), newRule(/z/g, 'Z')];
+		const rules = [
+			newRule('/test', /x/g, 'X'),
+			newRule('/test', /y/g, 'Y'),
+			newRule('/test', /z/g, 'Z'),
+		];
 		registerRule(locale, ...rules);
 		expect(typographyRules[locale]).toHaveLength(3);
 		for (const r of rules) expect(typographyRules[locale]).toContain(r);
@@ -100,9 +104,9 @@ describe('registerRule()', () => {
 
 	it('appends array to already existing locale rules', () => {
 		const locale = `test-locale-array-append-${Date.now()}`;
-		const first = newRule(/a/g, 'A');
+		const first = newRule('/test', /a/g, 'A');
 		registerRule(locale, first);
-		const more = [newRule(/b/g, 'B'), newRule(/c/g, 'C')];
+		const more = [newRule('/test', /b/g, 'B'), newRule('/test', /c/g, 'C')];
 		registerRule(locale, ...more);
 		expect(typographyRules[locale]).toHaveLength(3);
 	});
@@ -209,8 +213,8 @@ describe('typographyRules store', () => {
 
 	it('getWeightedRules sorts by weight ascending', () => {
 		const locale = `weighted-${Date.now()}`;
-		const heavy = newRule(/b/g, 'B', 100);
-		const light = newRule(/a/g, 'A', 1);
+		const heavy = newRule('/test', /b/g, 'B', 100);
+		const light = newRule('/test', /a/g, 'A', 1);
 		registerRule(locale, heavy);
 		registerRule(locale, light);
 		const result = getWeightedRules(locale);
@@ -220,8 +224,8 @@ describe('typographyRules store', () => {
 
 	it('getWeightedRules preserves insertion order for equal-weight rules', () => {
 		const locale = `equal-weight-${Date.now()}`;
-		const r1 = newRule(/x/g, 'X', 5);
-		const r2 = newRule(/y/g, 'Y', 5);
+		const r1 = newRule('/test', /x/g, 'X', 5);
+		const r2 = newRule('/test', /y/g, 'Y', 5);
 		registerRule(locale, r1);
 		registerRule(locale, r2);
 		const result = getWeightedRules(locale);
@@ -244,7 +248,7 @@ describe('typographyRules store', () => {
 		resetTypographyRules();
 
 		const locale = `only-locale-${Date.now()}`;
-		const rule = newRule(/q/g, 'Q', 1);
+		const rule = newRule('/test', /q/g, 'Q', 1);
 		registerRule(locale, rule);
 
 		const result = getWeightedRules(locale);
@@ -258,7 +262,7 @@ describe('typographyRules store', () => {
 		const saved = { ...typographyRules };
 		resetTypographyRules();
 
-		const commonRule = newRule(/w/g, 'W', 0);
+		const commonRule = newRule('/test', /w/g, 'W', 0);
 		registerRule('common', commonRule);
 
 		const result = getWeightedRules('nonexistent-locale-abc');
@@ -269,7 +273,7 @@ describe('typographyRules store', () => {
 
 	it('resetTypographyRules empties all arrays', () => {
 		const locale = `reset-test-${Date.now()}`;
-		registerRule(locale, newRule(/z/g, 'Z'));
+		registerRule(locale, newRule('/test', /z/g, 'Z'));
 		resetTypographyRules();
 		for (const key of Object.keys(typographyRules)) {
 			expect(typographyRules[key]).toEqual([]);
@@ -541,7 +545,7 @@ describe('rulesHas() and rulesCount()', () => {
 
 	it('rulesHas() returns true after registerRule', () => {
 		const locale = `has-test-${Date.now()}`;
-		registerRule(locale, newRule(/x/g, 'X'));
+		registerRule(locale, newRule('/test', /x/g, 'X'));
 		expect(rulesHas(locale)).toBe(true);
 	});
 
@@ -551,8 +555,8 @@ describe('rulesHas() and rulesCount()', () => {
 
 	it('rulesCount() returns correct count after registerRule', () => {
 		const locale = `count-test-${Date.now()}`;
-		registerRule(locale, newRule(/a/g, 'A'));
-		registerRule(locale, newRule(/b/g, 'B'));
+		registerRule(locale, newRule('/test', /a/g, 'A'));
+		registerRule(locale, newRule('/test', /b/g, 'B'));
 		expect(rulesCount(locale)).toBe(2);
 	});
 

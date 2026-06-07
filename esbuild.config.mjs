@@ -8,6 +8,33 @@ const limit = pkg.bundleSizeLimit;
 
 await rm('dist', { recursive: true, force: true });
 
+const externalImportsPlugin = (format, relative = './') => ({
+	name: 'external-glyphs',
+	setup(build) {
+		build.onResolve({ filter: /.*/ }, (args) => {
+			if (args.importer && args.path.includes('/glyphs')) {
+				return {
+					path: format === 'esm' ? relative + 'glyphs/index.mjs' : relative + 'glyphs/index.cjs',
+					external: true,
+				};
+			}
+			if (args.importer && args.path.includes('/helpers')) {
+				return {
+					path: format === 'esm' ? relative + 'helpers/index.mjs' : relative + 'helpers/index.cjs',
+					external: true,
+				};
+			}
+			if (args.importer && args.path.includes('/functions')) {
+				return {
+					path:
+						format === 'esm' ? relative + 'functions/index.mjs' : relative + 'functions/index.cjs',
+					external: true,
+				};
+			}
+		});
+	},
+});
+
 const common = {
 	bundle: true,
 	treeShaking: true,
@@ -23,52 +50,54 @@ const glyphsMJS = await build({
 	entryPoints: ['src/glyphs/index.ts'],
 	format: 'esm',
 	outfile: 'dist/glyphs/index.mjs',
+	plugins: [externalImportsPlugin('esm', '../')],
 });
 const glyphsCJS = await build({
 	...common,
 	entryPoints: ['src/glyphs/index.ts'],
 	format: 'cjs',
 	outfile: 'dist/glyphs/index.cjs',
+	plugins: [externalImportsPlugin('cjs', '../')],
 });
 
-await writeFile('dist/glyphs-meta-esm.json', JSON.stringify(glyphsMJS.metafile));
-await writeFile('dist/glyphs-meta-cjs.json', JSON.stringify(glyphsCJS.metafile));
+await writeFile('dist/glyphs/meta-esm.json', JSON.stringify(glyphsMJS.metafile));
+await writeFile('dist/glyphs/meta-cjs.json', JSON.stringify(glyphsCJS.metafile));
 
 const helpersMJS = await build({
 	...common,
 	entryPoints: ['src/helpers/index.ts'],
 	format: 'esm',
 	outfile: 'dist/helpers/index.mjs',
+	plugins: [externalImportsPlugin('esm', '../')],
 });
 const helpersCJS = await build({
 	...common,
 	entryPoints: ['src/helpers/index.ts'],
 	format: 'cjs',
 	outfile: 'dist/helpers/index.cjs',
+	plugins: [externalImportsPlugin('cjs', '../')],
 });
 
-await writeFile('dist/helpers-meta-esm.json', JSON.stringify(helpersMJS.metafile));
-await writeFile('dist/helpers-meta-cjs.json', JSON.stringify(helpersCJS.metafile));
+await writeFile('dist/helpers/meta-esm.json', JSON.stringify(helpersMJS.metafile));
+await writeFile('dist/helpers/meta-cjs.json', JSON.stringify(helpersCJS.metafile));
 
-const externalImportsPlugin = (format) => ({
-	name: 'external-glyphs',
-	setup(build) {
-		build.onResolve({ filter: /.*/ }, (args) => {
-			if (args.importer && args.path.includes('/glyphs')) {
-				return {
-					path: format === 'esm' ? './glyphs/index.mjs' : './glyphs/index.cjs',
-					external: true,
-				};
-			}
-			if (args.importer && args.path.includes('/helpers')) {
-				return {
-					path: format === 'esm' ? './helpers/index.mjs' : './helpers/index.cjs',
-					external: true,
-				};
-			}
-		});
-	},
+const functionsMJS = await build({
+	...common,
+	entryPoints: ['src/functions/index.ts'],
+	format: 'esm',
+	outfile: 'dist/functions/index.mjs',
+	plugins: [externalImportsPlugin('esm', '../')],
 });
+const functionsCJS = await build({
+	...common,
+	entryPoints: ['src/functions/index.ts'],
+	format: 'cjs',
+	outfile: 'dist/functions/index.cjs',
+	plugins: [externalImportsPlugin('cjs', '../')],
+});
+
+await writeFile('dist/functions/meta-esm.json', JSON.stringify(functionsMJS.metafile));
+await writeFile('dist/functions/meta-cjs.json', JSON.stringify(functionsCJS.metafile));
 
 const resultMJS = await build({
 	...common,
