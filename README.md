@@ -61,7 +61,7 @@ registerRule(
 );
 
 // Function rule — full custom processing function
-import { smartQuotes } from '@yalla/typography-rules';
+import { smartQuotes } from '@yalla/typography-rules/functions';
 
 // Danish quotes: »Jeg husker, at hun sagde ›det her er vigtigt‹ i går.«
 registerRule(
@@ -257,6 +257,8 @@ Built-in rule labels follow a consistent hierarchy:
 These are composable text-processing functions that can be used directly or
 wrapped with `newRule`.
 
+Must be imported with `@yalla/typography-rules/functions`
+
 ### `smartQuotes(text, settings?)`
 
 Converts straight quotes (`"` and `'`) into typographically correct
@@ -264,7 +266,7 @@ opening/closing quote pairs, with support for nested quotation levels and
 apostrophe detection.
 
 ```typescript
-import { smartQuotes } from '@yalla/typography-rules';
+import { smartQuotes } from '@yalla/typography-rules/functions';
 
 smartQuotes('"Hello"'); // “Hello” (en defaults)
 smartQuotes('"He said \'hi\'"'); // “He said ‘hi’”
@@ -285,7 +287,7 @@ Inserts non-breaking spaces (or another character, e.g. `,`) as thousands
 separators into large numeric sequences.
 
 ```typescript
-import { smartNumberGrouping } from '@yalla/typography-rules';
+import { smartNumberGrouping } from '@yalla/typography-rules/functions';
 
 smartNumberGrouping('Price: 1234567');
 // "Price: 1 234 567"
@@ -310,7 +312,7 @@ Collapses runs of two or more identical space characters into a single one. By
 default targets non-breaking, hair, and thin spaces.
 
 ```typescript
-import { clearSpaces } from '@yalla/typography-rules';
+import { clearSpaces } from '@yalla/typography-rules/functions';
 
 clearSpaces('a  b  c'); // 'a b c'
 ```
