@@ -51,7 +51,7 @@ export const defaultRuleKeys = Object.keys(defaultRules) as (keyof typeof defaul
  * This function initializes the typography pipeline
  * before processing text transformations.
  *
- * @param from — Optional locale key to apply specific rule group
+ * @param from Optional locale key to apply specific rule group
  */
 export function applyDefaultRules(from?: string): void {
 	if (!from) {

@@ -1,5 +1,5 @@
 import { newRule, smartNumberGrouping, smartQuotes } from '@/functions';
-import { PUNCTUATION, WALLET, SPACES, DASHES } from '@/glyphs';
+import { PUNCTUATION, SPACES } from '@/glyphs';
 
 /**
  * Russian typography ruleset.
@@ -15,13 +15,9 @@ import { PUNCTUATION, WALLET, SPACES, DASHES } from '@/glyphs';
  * Designed for Cyrillic text normalization.
  */
 export default [
-	// Adds a non-breaking space as a thousands separator, e.g. 1 234 567
-	// Добавляет неразрывный пробел в качестве разделителя разрядов чисел
-	newRule(smartNumberGrouping, [{ separator: SPACES.noBreak }]),
-
-	// 0::Разное
-	newRule(/(\d+)[\s\u00A0](%|\u2030|\u2031)/g, '$1$2'),
+	newRule('/russian/number/groups', smartNumberGrouping, [{ separator: SPACES.noBreak }]),
 	newRule(
+		'/russian/typography/quotes',
 		smartQuotes,
 		[
 			{
@@ -31,6 +27,13 @@ export default [
 		],
 		100
 	),
+	newRule('/russian/typography/dot-after-quote', /\.»/g, '».', 1000),
+	/*
+	// Adds a non-breaking space as a thousands separator, e.g. 1 234 567
+	// Добавляет неразрывный пробел в качестве разделителя разрядов чисел
+
+	// 0::Разное
+	newRule(/(\d+)[\s\u00A0](%|\u2030|\u2031)/g, '$1$2'),
 	newRule(
 		new RegExp(
 			`(?<=[${PUNCTUATION.get('ru', 'leftSided').join('')}\\(\\[])\\s+|(?<!\\s)\\s(?=[${PUNCTUATION.get('ru', 'rightSided').join('')}\\)\\]])`,
@@ -39,7 +42,6 @@ export default [
 		'',
 		1000
 	),
-	newRule(/\.»/g, '».', 1000),
 	newRule(
 		new RegExp(
 			`(?<!\\d\\s)([${WALLET.join()}])\\s(\\d{1,3}(?:\\d{3})*(?:,\\d+)?|\\d+(?:,\\d+)?)`,
@@ -88,4 +90,5 @@ export default [
 		),
 		SPACES.noBreak
 	),
+*/
 ];

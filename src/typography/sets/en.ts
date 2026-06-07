@@ -1,5 +1,5 @@
 import { newRule, smartNumberGrouping, smartQuotes } from '@/functions';
-import { PUNCTUATION, WALLET, LIGATURES } from '@/glyphs';
+import { PUNCTUATION, LIGATURES } from '@/glyphs';
 
 /**
  * English typography ruleset.
@@ -13,10 +13,11 @@ import { PUNCTUATION, WALLET, LIGATURES } from '@/glyphs';
  * Designed for Latin-script typography processing.
  */
 export default [
-	// Adds a comma as a thousands separator, e.g. 1,234,567
-	newRule(smartNumberGrouping, [{ separator: PUNCTUATION.common.rightSided.comma }]),
-
+	newRule('/english/number/groups', smartNumberGrouping, [
+		{ separator: PUNCTUATION.common.rightSided.comma },
+	]),
 	newRule(
+		'/english/typography/quotes',
 		smartQuotes,
 		[
 			{
@@ -26,6 +27,13 @@ export default [
 		],
 		100
 	),
+	newRule('/english/ligatures/fi', /fi/g, LIGATURES.fi),
+	newRule('/english/ligatures/fl', /fl/g, LIGATURES.fl),
+	newRule('/english/ligatures/ffi', /ffi/g, LIGATURES.ffi),
+	newRule('/english/ligatures/ffl', /ffl/g, LIGATURES.ffl),
+	/*
+	// Adds a comma as a thousands separator, e.g. 1,234,567
+
 	newRule(
 		new RegExp(
 			`(?<=[${PUNCTUATION.get('en', 'leftSided').join('')}“‘\\(\\[])\\s+|(?<!\\s)\\s(?=[${PUNCTUATION.get('en', 'rightSided').join('')}”’\\)\\]])`,
@@ -35,8 +43,5 @@ export default [
 		1000
 	),
 	newRule(new RegExp(`([${WALLET.join()}])\\s?(\\d+)`, 'g'), `$1$2`),
-	newRule(/fi/g, LIGATURES.fi),
-	newRule(/fl/g, LIGATURES.fl),
-	newRule(/ffi/g, LIGATURES.ffi),
-	newRule(/ffl/g, LIGATURES.ffl),
+*/
 ];

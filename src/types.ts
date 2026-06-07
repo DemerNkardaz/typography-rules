@@ -55,6 +55,7 @@ export type FunctionRule<
 	TArgs extends unknown[] = unknown[],
 	TFn extends (text: string, ...args: TArgs) => string = (text: string, ...args: TArgs) => string,
 > = BaseRule & {
+	label: string;
 	kind: 'function';
 	rule: TFn;
 	args: TArgs;

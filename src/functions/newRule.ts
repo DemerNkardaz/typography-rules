@@ -46,21 +46,24 @@ import type {
  * // Function rule
  * newRule(myRuleFn, ['arg1', 'arg2']);
  */
-function newRule(rule: RegExp, replacement: string, weight?: number): Rule;
+function newRule(label: string, rule: RegExp, replacement: string, weight?: number): Rule;
 function newRule(
+	label: string,
 	rule: RegExp,
 	transform: (match: RegExpExecArray) => string,
 	weight?: number
 ): Rule;
-function newRule(rule: RuleFunction, args?: unknown[], weight?: number): Rule;
+function newRule(label: string, rule: RuleFunction, args?: unknown[], weight?: number): Rule;
 
 function newRule(
+	label: string,
 	rule: RegExp | RuleFunction,
 	second?: string | ((match: RegExpExecArray) => string) | unknown[],
 	weight = 0
 ): Rule {
 	if (typeof rule === 'function') {
 		return {
+			label,
 			kind: 'function',
 			rule,
 			args: Array.isArray(second) ? second : [],
@@ -70,6 +73,7 @@ function newRule(
 
 	if (typeof second === 'string') {
 		return {
+			label,
 			kind: 'replace',
 			rule: rule as RegExp,
 			replacement: second,
@@ -78,6 +82,7 @@ function newRule(
 	}
 
 	return {
+		label,
 		kind: 'transform',
 		rule: rule as RegExp,
 		transform: second as (match: RegExpExecArray) => string,

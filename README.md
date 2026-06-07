@@ -52,12 +52,12 @@ const rules = getWeightedRules('ru'); // common + ru rules, sorted by weight
 import { newRule, registerRule } from '@yalla/typography-rules';
 
 // Replace rule — static string substitution
-registerRule('en', newRule(/\(c\)/gi, '©'));
+registerRule('en', newRule('/english/copyright', /\(c\)/gi, '©'));
 
 // Transform rule — dynamic replacement per match
 registerRule(
   'en',
-  newRule(/\d+/g, (match) => `[${match[0]}]`)
+  newRule('/english/bracket-numbers', /\d+/g, (match) => `[${match[0]}]`)
 );
 
 // Function rule — full custom processing function
@@ -66,7 +66,9 @@ import { smartQuotes } from '@yalla/typography-rules';
 // Danish quotes: »Jeg husker, at hun sagde ›det her er vigtigt‹ i går.«
 registerRule(
   'da',
-  newRule(smartQuotes, [{ outer: ['»', '«'], inner: ['›', '‹'] }])
+  newRule('/danish/typography/quotes', smartQuotes, [
+    { outer: ['»', '«'], inner: ['›', '‹'] },
+  ])
 );
 ```
 
@@ -78,9 +80,9 @@ import { DASHES } from '@yalla/typography-rules/glyphs';
 
 registerRule(
   'en',
-  newRule(/--/g, DASHES.em),
-  newRule(/\(r\)/gi, '®'),
-  newRule(/\(tm\)/gi, '™')
+  newRule('/english/em-dash', /--/g, DASHES.em),
+  newRule('/english/registered', /\(r\)/gi, '®'),
+  newRule('/english/trademark', /\(tm\)/gi, '™')
 );
 ```
 
@@ -88,26 +90,27 @@ registerRule(
 
 ## Core API
 
-### `newRule(rule, second?, weight?)`
+### `newRule(label, rule, second?, weight?)`
 
 Creates a typed typography rule object. Supports three overloads:
 
 ```typescript
 // 1. Replace rule
-newRule(/--/g, '—');
+newRule('/my/rule/label', /--/g, '—');
 
 // 2. Transform rule
-newRule(/\d+/g, (match: RegExpExecArray) => `[${match[0]}]`);
+newRule('/my/rule/label', /\d+/g, (match: RegExpExecArray) => `[${match[0]}]`);
 
 // 3. Function rule
-newRule(myFunction, ['arg1', 'arg2']);
+newRule('/my/rule/label', myFunction, ['arg1', 'arg2']);
 ```
 
-| Parameter | Type                               | Description                                                |
-| --------- | ---------------------------------- | ---------------------------------------------------------- |
-| `rule`    | `RegExp \| RuleFunction`           | Pattern or processing function                             |
-| `second`  | `string \| transform fn \| args[]` | Replacement, transformer, or arguments                     |
-| `weight`  | `number`                           | Execution priority — lower values run first (default: `0`) |
+| Parameter | Type                               | Description                                                                                                              |
+| --------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `label`   | `string`                           | Unique rule identifier path, e.g. '/en/math/fractions'. Used by the blacklist system to enable/disable rules selectively |
+| `rule`    | `RegExp \| RuleFunction`           | Pattern or processing function                                                                                           |
+| `second`  | `string \| transform fn \| args[]` | Replacement, transformer, or arguments                                                                                   |
+| `weight`  | `number`                           | Execution priority — lower values run first (default: `0`)                                                               |
 
 ---
 
@@ -160,6 +163,92 @@ Utility functions for inspecting the rule registry:
 rulesHas('en'); // boolean
 rulesCount('en'); // number
 ```
+
+---
+
+### Rule Blacklist
+
+A trie-based system for selectively disabling rules by their label path without
+removing them from the registry. Supports hierarchical matching — disabling a
+path prefix disables all rules nested under it.
+
+```typescript
+import {
+  disableRule,
+  enableRule,
+  toggleRule,
+  isRuleDisabled,
+  isGloballyDisabled,
+  clearBlacklist,
+} from '@yalla/typography-rules';
+```
+
+#### `disableRule(rule)`
+
+Disables a rule or an entire rule subtree by path prefix. The special value
+`'*'` disables all rules globally.
+
+```typescript
+disableRule('/common/math/negative-number'); // disable one rule
+disableRule('/english/ligatures'); // disable all ligature rules
+disableRule('*'); // disable everything
+```
+
+#### `enableRule(rule)`
+
+Re-enables a previously disabled rule. Clears the global flag if `'*'` is
+passed.
+
+```typescript
+enableRule('/english/ligatures/fi'); // re-enable a single rule
+enableRule('*'); // lift global disable
+```
+
+#### `toggleRule(rule)`
+
+Flips the disabled state of a rule — disables if enabled, enables if disabled.
+
+```typescript
+toggleRule('/common/typography/runt');
+```
+
+#### `isRuleDisabled(rule)`
+
+Returns `true` if the rule is disabled either directly, via a parent prefix, or
+globally.
+
+```typescript
+isRuleDisabled('/common/math/negative-number'); // boolean
+```
+
+#### `isGloballyDisabled()`
+
+Returns `true` if all rules have been globally disabled via `disableRule('*')`.
+
+```typescript
+isGloballyDisabled(); // boolean
+```
+
+#### `clearBlacklist()`
+
+Resets the entire blacklist — removes all disabled paths and clears the global
+flag.
+
+```typescript
+clearBlacklist();
+```
+
+#### Label path conventions
+
+Built-in rule labels follow a consistent hierarchy:
+
+| Segment        | Example                                   | Meaning                |
+| -------------- | ----------------------------------------- | ---------------------- |
+| `common`       | `/common/math/…`                          | Applies to all locales |
+| `english`      | `/english/ligatures/…`                    | English-only rules     |
+| `russian`      | `/russian/typography/…`                   | Russian-only rules     |
+| Second segment | `/common/space/…`, `/common/typography/…` | Rule category          |
+| Third segment  | `/common/math/negative-number`            | Specific rule          |
 
 ---
 
@@ -374,19 +463,19 @@ splitNodes(processed, nodes); // writes segments back to nodes
 
 ### Common (applied to all locales)
 
-| Pattern / Trigger                                                    | Replacement                          | Description                                                                                         |
-| -------------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| Multiple identical spaces (`\u00A0{2,}`, `\u200A{2,}`, `\u2009{2,}`) | Single space                         | Collapses duplicate non-breaking, hair, and thin spaces via `clearSpaces`                           |
-| Leading / trailing whitespace (`^\s` or `\s$`)                       | _(removed)_                          | Trims surrounding whitespace from the processed text                                                |
-| Hyphen-minus before digit (`-123`)                                   | Minus sign + digit (`−123`)          | Replaces ASCII hyphen-minus with proper Unicode minus sign `−` (`\u2212`) in negative numbers       |
-| Digit range with hyphen (`1-2`)                                      | En dash range (`1–2`)                | Converts hyphen between two integer sequences into an en dash                                       |
-| Number–number with en dash or minus (`−2–3`)                         | Ellipsis range (`−2…3`)              | Converts numeric ranges using en dash or minus into ellipsis notation                               |
-| Double hyphen (`--`)                                                 | Em dash (`—`)                        | Replaces double hyphen-minus with a typographic em dash                                             |
-| Four or more consecutive dots (`....`)                               | Three dots (`...`)                   | Normalizes over-long dot sequences before ellipsis conversion                                       |
-| Three dots (`...`)                                                   | Ellipsis (`…`)                       | Converts ASCII triple-dot into the Unicode ellipsis character `…` (`\u2026`)                        |
-| Two or more consecutive ellipses (`……`)                              | Single ellipsis (`…`)                | Deduplicates repeated ellipsis characters                                                           |
-| Straight apostrophe / right single quote (`'`)                       | Typographic apostrophe (`’`)         | Replaces ASCII apostrophe with the Unicode right single quotation mark `'` (`\u2019`), weight `200` |
-| Short last word(s) in a paragraph                                    | Preceding space → non-breaking space | `runt`: prevents widows/runts by tying the last short word(s) to the preceding word                 |
+| Label                                       | Pattern / Trigger                                                    | Replacement                | Description                                                                            |
+| ------------------------------------------- | -------------------------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------- |
+| `/common/space/cleanup/default`             | Multiple identical spaces (`\u00A0{2,}`, `\u200A{2,}`, `\u2009{2,}`) | Single space               | Collapses duplicate non-breaking, hair, and thin spaces via `clearSpaces`              |
+| `/common/space/cleanup/trim`                | Leading / trailing whitespace (`^\s` or `\s$`)                       | _(removed)_                | Trims surrounding whitespace from the processed text                                   |
+| `/common/math/negative-number`              | Hyphen-minus before digit (`-123`)                                   | `−123`                     | Replaces ASCII hyphen-minus with Unicode minus sign `−` (`\u2212`) in negative numbers |
+| `/common/math/number-range/default`         | Digit range with hyphen (`1-2`)                                      | `1–2`                      | Converts hyphen between two integer sequences into an en dash                          |
+| `/common/math/number-range/ellipsis`        | Number range with en dash or minus (`−2–3`)                          | `−2…3`                     | Converts numeric ranges using en dash or minus into ellipsis notation                  |
+| `/common/typography/dashes`                 | Double hyphen (`--`)                                                 | `—`                        | Replaces double hyphen-minus with a typographic em dash                                |
+| `/common/typography/dots/dots-overload`     | Four or more consecutive dots (`....`)                               | `...`                      | Normalizes over-long dot sequences before ellipsis conversion                          |
+| `/common/typography/dots/ellipsis`          | Three dots (`...`)                                                   | `…`                        | Converts ASCII triple-dot into the Unicode ellipsis character `…` (`\u2026`)           |
+| `/common/typography/dots/ellipsis-overload` | Two or more consecutive ellipses (`……`)                              | `…`                        | Deduplicates repeated ellipsis characters                                              |
+| `/common/typography/apostrophe`             | Straight apostrophe (`'`)                                            | `'`                        | Replaces with Unicode right single quotation mark `'` (`\u2019`), weight `200`         |
+| `/common/typography/runt`                   | Short last word(s) in a paragraph                                    | Preceding space → `\u00A0` | Prevents                                                                               |
 
 ---
 
