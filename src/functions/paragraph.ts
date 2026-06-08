@@ -1,9 +1,9 @@
 import { SPACES } from '@/glyphs';
-import type { runtSettings } from '@/types';
+import type { RuntSettings } from '@/types';
 
 export function runt(
 	text: string,
-	{ threshold = 10, space = SPACES.noBreak }: runtSettings = {}
+	{ threshold = 10, space = SPACES.noBreak }: RuntSettings = {}
 ): string {
 	const segmenter = new Intl.Segmenter(undefined, {
 		granularity: 'word',
@@ -56,7 +56,6 @@ export function runt(
 		if ([...prev.word].length >= limit) {
 			replaceBefore(prev.index);
 
-			// защитить второе слово от конца
 			protectWord(prev.index, prev.word);
 
 			break;

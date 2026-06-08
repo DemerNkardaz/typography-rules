@@ -1,9 +1,9 @@
-import type { Node, tagSettings, rubyTextSettings } from '@/types';
+import type { Node, TagSettings, RubyTextSettings } from '@/types';
 
 export function rubyText(
 	text: string,
-	{ marker = ':', wrapper = ['[', ']'] }: rubyTextSettings = {},
-	{ className, attrs }: tagSettings = {}
+	{ marker = ':', wrapper = ['[', ']'] }: RubyTextSettings = {},
+	{ className, attrs }: TagSettings = {}
 ): Node[] {
 	const result: Node[] = [];
 	let i = 0;

@@ -1,9 +1,9 @@
-import type { ElementNode, htmlNodeSettings, Node, TextNode } from '@/types';
+import type { ElementNode, HtmlNodeSettings, Node, TextNode } from '@/types';
 
 import type { Text } from 'mdast';
 import type { MdxJsxTextElement } from 'mdast-util-mdx-jsx';
 
-export function htmlNode(text: string, { expression, nodes }: htmlNodeSettings = {}): Node[] {
+export function htmlNode(text: string, { expression, nodes }: HtmlNodeSettings = {}): Node[] {
 	if (!expression || !nodes) {
 		return [{ type: 'text', value: text }];
 	}

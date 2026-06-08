@@ -290,10 +290,10 @@ separators into large numeric sequences.
 import { smartNumberGrouping } from '@yalla/typography-rules/functions';
 
 smartNumberGrouping('Price: 1234567');
-// "Price: 1 234 567"
+// “Price: 1 234 567”
 
 smartNumberGrouping('Value: 1234567.891011', { separateFloat: true });
-// "Value: 1 234 567.891 011"
+// “Value: 1 234 567.891 011”
 ```
 
 **Settings:**
@@ -337,6 +337,61 @@ longer last words, also protects the penultimate word.
 | ----------- | ------------------ | ---------------- | -------------------------------------------------------------------- |
 | `threshold` | `number`           | `10`             | Maximum character length of the last word to trigger runt protection |
 | `space`     | `Spaces \| string` | `SPACES.noBreak` | Replacement space character                                          |
+
+---
+
+### `wrapWithTag(text, settings?, tagSettings?)`
+
+Wraps matched bracket-marker syntax into an HTML element node. Returns `Node[]`.
+
+```typescript
+import { wrapWithTag } from '@yalla/typography-rules/functions';
+
+wrapWithTag('H[^2]O');
+// → [text('H'), sup([text('2')]), text('O')]
+```
+
+**Settings:**
+
+| Option    | Type               | Default      | Description                              |
+| --------- | ------------------ | ------------ | ---------------------------------------- |
+| `marker`  | `string`           | `'^'`        | Character after opening bracket          |
+| `tag`     | `string`           | `'sup'`      | HTML tag name for the wrapping element   |
+| `wrapper` | `[string, string]` | `['[', ']']` | Bracket pair delimiting the marked range |
+
+**Tag settings:**
+
+| Option      | Type                     | Description                |
+| ----------- | ------------------------ | -------------------------- |
+| `className` | `string`                 | CSS class on the element   |
+| `attrs`     | `Record<string, string>` | Additional HTML attributes |
+
+---
+
+### `rubyText(text, settings?, tagSettings?)`
+
+Parses ruby annotation syntax into a `<ruby>` node tree with `<rb>` / `<rt>`
+pairs. Returns `Node[]`.
+
+```typescript
+import { rubyText } from '@yalla/typography-rules/functions';
+
+rubyText('[:平安時代][:へいあんじだい]');
+// → ruby → [ rb('平安時代'), rt('へいあんじだい') ]
+
+// Multiple base|furigana pairs separated by |
+rubyText('[:東|京][:とう|きょう]');
+// → ruby → [ rb('東'), rt('ひがし'), rb('京'), rt('きょう') ]
+```
+
+**Settings:**
+
+| Option    | Type               | Default      | Description                                              |
+| --------- | ------------------ | ------------ | -------------------------------------------------------- |
+| `marker`  | `string`           | `':'`        | Character after opening bracket associated with the ruby |
+| `wrapper` | `[string, string]` | `['[', ']']` | Bracket pair delimiting the ruby group                   |
+
+**Tag settings:** same as `wrapWithTag`.
 
 ---
 
@@ -477,7 +532,10 @@ splitNodes(processed, nodes); // writes segments back to nodes
 | `/common/typography/dots/ellipsis`          | Three dots (`...`)                                                   | `…`                        | Converts ASCII triple-dot into the Unicode ellipsis character `…` (`\u2026`)           |
 | `/common/typography/dots/ellipsis-overload` | Two or more consecutive ellipses (`……`)                              | `…`                        | Deduplicates repeated ellipsis characters                                              |
 | `/common/typography/apostrophe`             | Straight apostrophe (`'`)                                            | `'`                        | Replaces with Unicode right single quotation mark `'` (`\u2019`), weight `200`         |
-| `/common/typography/runt`                   | Short last word(s) in a paragraph                                    | Preceding space → `\u00A0` | Prevents                                                                               |
+| `/common/wraps/sup`                         | `[^…]` marker syntax                                                 | `<sup>` node               | Wraps bracket-marker content in a superscript element via `wrapWithTag`                |
+| `/common/wraps/sub`                         | `[_…]` marker syntax                                                 | `<sub>` node               | Wraps bracket-marker content in a subscript element via `wrapWithTag`                  |
+| `/common/wraps/ruby`                        | `[:base\|…][:annotation\|…]` syntax                                  | `<ruby>` node tree         | Parses ruby annotation pairs into `<ruby><rb/><rt/></ruby>` via `rubyText`             |
+| `/common/typography/runt`                   | Short last word(s) in a paragraph                                    | Preceding space → `\u00A0` | Prevents typographic runts. Weight: `Infinity` — always runs last                      |
 
 ---
 
@@ -506,12 +564,34 @@ _Rules coming soon._
 Rules are applied in ascending weight order. Rules with equal weight preserve
 their registration order (stable sort).
 
-| Weight        | Meaning                                                           |
-| ------------- | ----------------------------------------------------------------- |
-| `0` (default) | Standard priority                                                 |
-| `< 0`         | Applied before standard rules                                     |
-| `> 0`         | Applied after standard rules                                      |
-| `200`         | Late-stage — e.g. apostrophe normalization after quote processing |
+| Weight        | Meaning                                                             |
+| ------------- | ------------------------------------------------------------------- |
+| `0` (default) | Standard priority                                                   |
+| `< 0`         | Applied before standard rules                                       |
+| `> 0`         | Applied after standard rules                                        |
+| `100`         | Early-stage — e.g. quote normalization before apostrophe processing |
+| `200`         | Late-stage — e.g. apostrophe normalization after quote processing   |
+| `Infinity`    | Always last — e.g. `runt`, which must run after all text transforms |
+
+---
+
+### Node utilities
+
+```typescript
+import {
+  htmlNode,
+  renderNode,
+  renderNodes,
+  nodeToMdast,
+} from '@yalla/typography-rules';
+```
+
+| Function      | Signature                                   | Description                                                         |
+| ------------- | ------------------------------------------- | ------------------------------------------------------------------- |
+| `htmlNode`    | `(text, settings?) => Node[]`               | Splits text into a mixed array of text and element nodes via RegExp |
+| `renderNode`  | `(node: Node) => string`                    | Serializes a single `Node` to an HTML string                        |
+| `renderNodes` | `(nodes: Node[]) => string`                 | Serializes an array of `Node` to an HTML string                     |
+| `nodeToMdast` | `(node: Node) => Text \| MdxJsxTextElement` | Converts an internal `Node` to an mdast-compatible AST node         |
 
 ---
 
@@ -525,10 +605,18 @@ import type {
   RegExpReplaceRule,
   RegExpTransformRule,
   FunctionRule,
+  NodeFunctionRule,
   RuleFunction,
+  Node,
+  TextNode,
+  ElementNode,
   QuoteSettings,
   NumberSpaceSettings,
   ClearSpacesSettings,
-  runtSettings,
+  RuntSettings,
+  HtmlNodeSettings,
+  WrapWithTagsSettings,
+  RubyTextSettings,
+  TagSettings,
 } from '@yalla/typography-rules';
 ```

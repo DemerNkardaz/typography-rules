@@ -1,9 +1,9 @@
-import type { Node, tagSettings, wrapWithTagsSettings } from '@/types';
+import type { Node, TagSettings, WrapWithTagsSettings } from '@/types';
 
 export function wrapWithTag(
 	text: string,
-	{ marker = '^', tag = 'sup', wrapper = ['[', ']'] }: wrapWithTagsSettings = {},
-	{ className, attrs }: tagSettings = {}
+	{ marker = '^', tag = 'sup', wrapper = ['[', ']'] }: WrapWithTagsSettings = {},
+	{ className, attrs }: TagSettings = {}
 ): Node[] {
 	const result: Node[] = [];
 	let i = 0;

@@ -144,28 +144,28 @@ export interface ClearSpacesSettings {
  * @property threshold — Threshold value for runt detection
  * @property space — Space character used for runt replacement
  */
-export interface runtSettings {
+export interface RuntSettings {
 	threshold?: number;
 	space?: Spaces | string;
 }
 
-export interface htmlNodeSettings {
+export interface HtmlNodeSettings {
 	expression?: RegExp;
 	nodes?: (match: RegExpExecArray) => Node;
 }
 
-export interface wrapWithTagsSettings {
+export interface WrapWithTagsSettings {
 	marker?: string;
 	tag?: string;
 	wrapper?: [string, string];
 }
 
-export interface rubyTextSettings {
+export interface RubyTextSettings {
 	marker?: string;
 	wrapper?: [string, string];
 }
 
-export interface tagSettings {
+export interface TagSettings {
 	className?: string;
 	attrs?: Record<string, string>;
 }

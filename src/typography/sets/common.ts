@@ -52,6 +52,8 @@ export default [
 		`$1${PUNCTUATION.common.rightSided.ellipsis}$2`
 	),
 
+	// HTML Wraps
+	// Wraps for superscript and subscript
 	newRule('/common/wraps/sup', wrapWithTag, [
 		{ marker: '^', tag: 'sup' },
 		{ className: '@yalla-typography-sup' },
@@ -60,6 +62,8 @@ export default [
 		{ marker: '_', tag: 'sub' },
 		{ className: '@yalla-typography-sub' },
 	]),
+
+	// Wraps for ルビ, furigana
 	newRule('/common/wraps/ruby', rubyText, [
 		{ marker: ':' },
 		{ className: '@yalla-typography-ruby' },
@@ -86,5 +90,5 @@ export default [
 	newRule('/common/typography/apostrophe', /'/g, PUNCTUATION.common.generic.apostrophe, 200),
 
 	// Runt
-	newRule('/common/typography/runt', runt),
+	newRule('/common/typography/runt', runt, [], Infinity),
 ];
