@@ -1,21 +1,27 @@
 import { readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const setsDir = join(process.cwd(), 'src', 'typography', 'sets');
+const directories = ['sets', 'markup'];
 
-const files = readdirSync(setsDir)
-	.filter((file) => file.endsWith('.ts'))
-	.filter((file) => file !== 'index.ts');
+for (const dir of directories) {
+	const targetDir = join(process.cwd(), 'src', 'typography', dir);
 
-const exports = files
-	.map((file) => {
-		const name = file.replace(/\.ts$/, '');
-		return `export { default as ${name} } from './${name}';`;
-	})
-	.join('\n');
+	const files = readdirSync(targetDir)
+		.filter((file) => file.endsWith('.ts'))
+		.filter((file) => file !== 'index.ts');
 
-const content = '// AUTO-GENERATED FILE. DO NOT EDIT.\n\n' + exports + '\n';
+	const exports = files
+		.map((file) => {
+			const name = file.replace(/\.ts$/, '');
+			return `export { default as ${name} } from './${name}';`;
+		})
+		.join('\n');
 
-writeFileSync(join(setsDir, 'index.ts'), content);
+	const content = '// AUTO-GENERATED FILE. DO NOT EDIT.\n\n' + exports + '\n';
 
-console.log(`Generated index.ts (${files.length} locales)`);
+	writeFileSync(join(targetDir, 'index.ts'), content);
+
+	console.log(`Generated ${dir}/index.ts (${files.length} files)`);
+}
+
+console.log('Done.');

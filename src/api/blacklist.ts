@@ -28,11 +28,11 @@ function getParts(rule: string): string[] {
  * Internal blacklist implemented as a Trie.
  *
  * Supports hierarchical rule disabling:
- * — Exact match: "/english/math"
- * — Prefix match: "/english/math" disables "/english/math/*"
+ * - Exact match: "/english/math"
+ * - Prefix match: "/english/math" disables "/english/math/*"
  *
  * Special rule:
- * — "*" disables all rules globally
+ * - "*" disables all rules globally
  *
  * This structure allows efficient prefix-based rule matching
  * without scanning a flat Set.
@@ -119,14 +119,14 @@ export function toggleRule(rule: string): void {
  * Checks whether a rule is disabled.
  *
  * A rule is considered disabled if:
- * — global disable flag "*" is active
- * — any parent rule in the path is disabled
- * — the rule itself is explicitly disabled
+ * - global disable flag "*" is active
+ * - any parent rule in the path is disabled
+ * - the rule itself is explicitly disabled
  *
  * Example:
  * "/english/math" disables:
- * — "/english/math"
- * — "/english/math/geometry"
+ * - "/english/math"
+ * - "/english/math/geometry"
  *
  * @param rule Rule path to check
  * @returns true if rule is disabled
@@ -160,8 +160,8 @@ export function isGloballyDisabled(): boolean {
  * Clears the entire rule blacklist.
  *
  * This removes:
- * — all explicitly disabled rules in the Trie
- * — global disable flag ("*")
+ * - all explicitly disabled rules in the Trie
+ * - global disable flag ("*")
  *
  * After calling this function, all rules become enabled again
  * unless re-disabled explicitly.

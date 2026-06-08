@@ -5,6 +5,7 @@ typographically correct output. Ships with a glyph registry, smart text
 functions, and a composable rule pipeline.
 
 Used as a rules provider for typography plugins such as
+[@yalla/typography-core](https://github.com/DemerNkardaz/typography-core) / 
 [@yalla/remark-typography](https://github.com/DemerNkardaz/remark-typography).
 
 ---
@@ -21,11 +22,12 @@ npm i @yalla/typography-rules
 
 ## Package Exports
 
-| Export path                       | Description                                                               |
-| --------------------------------- | ------------------------------------------------------------------------- |
-| `@yalla/typography-rules`         | Main entry — rules, store, types, functions                               |
-| `@yalla/typography-rules/glyphs`  | Glyph registries (DASHES, SPACES, PUNCTUATION, …)                         |
-| `@yalla/typography-rules/helpers` | Text pipeline helpers (protect/unprotect, node markers, pattern registry) |
+| Export path                         | Description                                                               |
+| ----------------------------------- | ------------------------------------------------------------------------- |
+| `@yalla/typography-rules`           | Main entry — rules, store, types, functions                               |
+| `@yalla/typography-rules/glyphs`    | Glyph registries (DASHES, SPACES, PUNCTUATION, …)                         |
+| `@yalla/typography-rules/helpers`   | Text pipeline helpers (protect/unprotect, node markers, pattern registry) |
+| `@yalla/typography-rules/functions` | Composable text-processing functions                                      |
 
 ---
 
@@ -34,13 +36,16 @@ npm i @yalla/typography-rules
 ### Using default rules
 
 ```typescript
-import { applyDefaultRules, getWeightedRules } from '@yalla/typography-rules';
+import { initTypographyRules, getWeightedRules } from '@yalla/typography-rules';
 
 // Register all built-in rule groups (common, ru, en, …)
-applyDefaultRules();
+initTypographyRules();
+
+// Register all built-in rules for makrup, e.g. [^text] → <sup>text</sup>
+initMarkupRules();
 
 // Or apply only a specific locale group
-applyDefaultRules('ru');
+initTypographyRules('ru');
 
 // Retrieve the merged, weight-sorted pipeline for a locale
 const rules = getWeightedRules('ru'); // common + ru rules, sorted by weight
@@ -126,14 +131,14 @@ registerRule('de', newRule(/--/g, '—'), newRule(/"/g, '„'));
 
 ---
 
-### `applyDefaultRules(from?)`
+### `initTypographyRules(from?)`
 
 Populates the global rule registry with the built-in default ruleset.
 
 ```typescript
-applyDefaultRules(); // All locales
-applyDefaultRules('en'); // English rules only
-applyDefaultRules('ru'); // Russian rules only
+initTypographyRules(); // All locales
+initTypographyRules('en'); // English rules only
+initTypographyRules('ru'); // Russian rules only
 ```
 
 ---
@@ -583,14 +588,19 @@ splitNodes(processed, nodes); // writes segments back to nodes
 | `/common/typography/dots/dots-overload`     | Four or more consecutive dots (`....`)                               | `...`                      | Normalizes over-long dot sequences before ellipsis conversion                          |
 | `/common/typography/dots/ellipsis`          | Three dots (`...`)                                                   | `…`                        | Converts ASCII triple-dot into the Unicode ellipsis character `…` (`\u2026`)           |
 | `/common/typography/dots/ellipsis-overload` | Two or more consecutive ellipses (`……`)                              | `…`                        | Deduplicates repeated ellipsis characters                                              |
-| `/common/typography/apostrophe`             | Straight apostrophe (`'`)                                            | `'`                        | Replaces with Unicode right single quotation mark `'` (`\u2019`), weight `200`         |
-| `/common/wraps/sup`                         | `[^…]` marker syntax                                                 | `<sup>` node               | Wraps bracket-marker content in a superscript element via `wrapWithTag`                |
-| `/common/wraps/sub`                         | `[_…]` marker syntax                                                 | `<sub>` node               | Wraps bracket-marker content in a subscript element via `wrapWithTag`                  |
-| `/common/wraps/chem`                        | `[%…]` marker syntax                                                 | `<math>` node tree         | Parses chemical notation into MathML `<mmultiscripts>` via `chemNotation`              |
-| `/common/wraps/ruby` (`:`)                  | `[:base\|…][:annotation\|…]` syntax                                  | `<ruby>` node tree         | Ruby annotation above the base (`--over`), via `rubyText`                              |
-| `/common/wraps/ruby` (`?:`)                 | `[?:base\|…][?:annotation\|…]` syntax                                | `<ruby>` node tree         | Alternate ruby style (`--alternate`), via `rubyText`                                   |
-| `/common/wraps/ruby` (`!:`)                 | `[!:base\|…][!:annotation\|…]` syntax                                | `<ruby>` node tree         | Ruby annotation below the base (`--under`), via `rubyText`                             |
+| `/common/typography/apostrophe`             | Straight apostrophe (`'`)                                            | `’`                        | Replaces with Unicode right single quotation mark `'` (`\u2019`), weight `200`         |
 | `/common/typography/runt`                   | Short last word(s) in a paragraph                                    | Preceding space → `\u00A0` | Prevents typographic runts. Weight: `Infinity` — always runs last                      |
+
+#### Markup Rules
+
+| Label                       | Pattern / Trigger                     | Replacement        | Description                                                               |
+| --------------------------- | ------------------------------------- | ------------------ | ------------------------------------------------------------------------- |
+| `/common/wraps/sup`         | `[^…]` marker syntax                  | `<sup>` node       | Wraps bracket-marker content in a superscript element via `wrapWithTag`   |
+| `/common/wraps/sub`         | `[_…]` marker syntax                  | `<sub>` node       | Wraps bracket-marker content in a subscript element via `wrapWithTag`     |
+| `/common/wraps/chem`        | `[%…]` marker syntax                  | `<math>` node tree | Parses chemical notation into MathML `<mmultiscripts>` via `chemNotation` |
+| `/common/wraps/ruby` (`:`)  | `[:base\|…][:annotation\|…]` syntax   | `<ruby>` node tree | Ruby annotation above the base (`--over`), via `rubyText`                 |
+| `/common/wraps/ruby` (`?:`) | `[?:base\|…][?:annotation\|…]` syntax | `<ruby>` node tree | Alternate ruby style (`--alternate`), via `rubyText`                      |
+| `/common/wraps/ruby` (`!:`) | `[!:base\|…][!:annotation\|…]` syntax | `<ruby>` node tree | Ruby annotation below the base (`--under`), via `rubyText`                |
 
 ---
 

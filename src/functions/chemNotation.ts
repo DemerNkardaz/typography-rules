@@ -92,9 +92,9 @@ function buildMmultiscripts({ base, supL, subL, supR, subR }: ScriptPositions): 
 
 /**
  * Parses chemical notation and converts it into MathML-like <mmultiscripts> structures.
- * * @param text The input string containing chemical notation syntax
- * @param settings Configuration for the marker and wrapper delimiters
- * @param tagSettings Optional class name and attributes for the <math> wrapper
+ * * @param text - The input string containing chemical notation syntax
+ * @param settings - Configuration for the marker and wrapper delimiters
+ * @param tagSettings - Optional class name and attributes for the <math> wrapper
  * @returns An array of nodes including text and <math> nodes
  */
 export function chemNotation(

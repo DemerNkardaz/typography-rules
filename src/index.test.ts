@@ -3,7 +3,7 @@ import {
 	typographyRules,
 	getWeightedRules,
 	resetTypographyRules,
-	applyDefaultRules,
+	initTypographyRules,
 	rulesHas,
 	rulesCount,
 	newRule,
@@ -21,7 +21,7 @@ import {
 } from './helpers';
 import { smartQuotes, smartNumberGrouping } from './functions';
 
-applyDefaultRules();
+initTypographyRules();
 
 // ─────────────────────────────────────────────
 // newRule
@@ -282,13 +282,13 @@ describe('typographyRules store', () => {
 });
 
 // ─────────────────────────────────────────────
-// typography/rules — applyDefaultRules
+// typography/rules — initTypographyRules
 // ─────────────────────────────────────────────
-describe('applyDefaultRules()', () => {
+describe('initTypographyRules()', () => {
 	// rules.ts line 7 — key not in defaultRules → no-op
 	it('does nothing for an unknown locale key', () => {
 		const before = { ...typographyRules };
-		applyDefaultRules('nonexistent-locale-key-xyz');
+		initTypographyRules('nonexistent-locale-key-xyz');
 		// store должен остаться без нового ключа
 		expect(typographyRules['nonexistent-locale-key-xyz']).toBeUndefined();
 		Object.assign(typographyRules, before);
@@ -296,7 +296,7 @@ describe('applyDefaultRules()', () => {
 
 	it('applies known locale without throwing', () => {
 		// 'common' уже применён при инициализации — повторный вызов не должен падать
-		expect(() => applyDefaultRules('common')).not.toThrow();
+		expect(() => initTypographyRules('common')).not.toThrow();
 		expect(Array.isArray(typographyRules['common'])).toBe(true);
 	});
 });
@@ -560,7 +560,7 @@ describe('rulesHas() and rulesCount()', () => {
 		expect(rulesCount(locale)).toBe(2);
 	});
 
-	it('rulesCount() returns correct count for common after applyDefaultRules', () => {
+	it('rulesCount() returns correct count for common after initTypographyRules', () => {
 		expect(rulesCount('common')).toBeGreaterThan(0);
 	});
 });

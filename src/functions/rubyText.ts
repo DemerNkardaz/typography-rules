@@ -3,9 +3,9 @@ import type { Node, TagSettings, RubyTextSettings } from '@/types';
 /**
  * Parses ruby annotation syntax (base text and reading) and converts it to a <ruby> structure.
  * Expected format: [marker]base|text[marker]reading
- * * @param text The input string containing ruby syntax
- * @param settings Configuration for the marker and wrapper delimiters
- * @param tagSettings Optional class name and attributes for the <ruby> element
+ * * @param text - The input string containing ruby syntax
+ * @param settings - Configuration for the marker and wrapper delimiters
+ * @param tagSettings - Optional class name and attributes for the <ruby> element
  * @returns An array of nodes containing text and <ruby> components (<rb>, <rt>)
  */
 export function rubyText(
@@ -54,7 +54,6 @@ export function rubyText(
 		const furiganaStart = text.indexOf(open, baseEnd + 1);
 
 		if (furiganaStart !== baseEnd + 1) {
-			// нет второй части — оставляем как текст
 			result.push({ type: 'text', value: text.slice(baseStart, baseEnd + 1) });
 			i = baseEnd + 1;
 			continue;

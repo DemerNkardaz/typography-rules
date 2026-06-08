@@ -4,9 +4,9 @@ import type { ClearSpacesSettings } from '@/types';
 /**
  * Replaces multiple spaces with a single space.
  *
- * @param text Input text.
+ * @param text - Input text.
  *
- * @param spaces Array of space characters to remove.
+ * @param spaces - Array of space characters to remove.
  *
  * @returns Text with multiple spaces replaced by a single space.
  *

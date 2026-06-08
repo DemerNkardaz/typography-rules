@@ -8,14 +8,14 @@ import type { QuoteSettings } from '@/types';
  * opening/closing quotes based on nesting context and surrounding characters.
  *
  * Supports:
- * — Outer and inner quote levels
- * — Nested quotation handling
- * — Apostrophe detection for contractions (e.g. don't, it's)
+ * - Outer and inner quote levels
+ * - Nested quotation handling
+ * - Apostrophe detection for contractions (e.g. don't, it's)
  *
- * @param text — Input string containing raw quotes.
- * @param quotes — Quote configuration for outer and inner levels.
- * @param quotes.outer — Pair of outer quotes: [open, close]
- * @param quotes.inner — Pair of inner quotes: [open, close]
+ * @param text - Input string containing raw quotes.
+ * @param quotes - Quote configuration for outer and inner levels.
+ * @param quotes.outer - Pair of outer quotes: [open, close]
+ * @param quotes.inner - Pair of inner quotes: [open, close]
  *
  * @returns String with typographically corrected quotes.
  *
@@ -81,7 +81,7 @@ export function smartQuotes(
 			const insideDoubleQuotes = stack.includes('"');
 
 			// Apostrophe: letter directly before AND letter/digit directly after
-			// e.g. it's, don't, o'clock — not a quote
+			// e.g. it's, don't, o'clock - not a quote
 			const isApostrophe =
 				/[a-zA-Z\u0430-\u044F\u0410-\u042F\u0451\u0401]/.test(prev) &&
 				/[a-zA-Z\u0430-\u044F\u0410-\u042F\u0451\u04010-9]/.test(next);

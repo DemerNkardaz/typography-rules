@@ -8,11 +8,11 @@ import type { NumberSpaceSettings } from '@/types';
  * them with `SPACES.nb` as a thousands separator. It also supports optional
  * formatting of fractional parts.
  *
- * @param text Input text that may contain numbers.
+ * @param text - Input text that may contain numbers.
  *
- * @param settings Formatting options:
- * — `minLength` — minimum integer length before spacing is applied (default: 5)
- * — `separateFloat` — whether to insert spacing inside fractional part groups
+ * @param settings - Formatting options:
+ * - `minLength` — minimum integer length before spacing is applied (default: 5)
+ * - `separateFloat` — whether to insert spacing inside fractional part groups
  *
  * @returns Text with formatted numbers containing non-breaking spaces.
  *

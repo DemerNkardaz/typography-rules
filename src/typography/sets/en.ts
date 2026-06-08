@@ -11,10 +11,10 @@ const EXPRESSIONS = {
  * English typography ruleset.
  *
  * Includes:
- * — smart quote replacement (US style)
- * — ligature substitution (fi, fl, ffi, ffl)
- * — currency formatting normalization
- * — spacing cleanup for punctuation
+ * - smart quote replacement (US style)
+ * - ligature substitution (fi, fl, ffi, ffl)
+ * - currency formatting normalization
+ * - spacing cleanup for punctuation
  *
  * Designed for Latin-script typography processing.
  */

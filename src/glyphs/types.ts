@@ -10,7 +10,7 @@ export type GlyphData = Record<string, string>;
  * Combines the original data shape `T` with a set of shared methods
  * attached via prototype (see `createCharacters`).
  *
- * @template T — Raw glyph dictionary shape
+ * @template T - Raw glyph dictionary shape
  */
 export type GlyphSet<T extends GlyphData = GlyphData> = {
 	[K in keyof T]: T[K];
@@ -18,12 +18,12 @@ export type GlyphSet<T extends GlyphData = GlyphData> = {
 	/**
 	 * Joins all glyph values into a single string.
 	 *
-	 * @param joiner — Separator between values. Defaults to `'|'`.
+	 * @param joiner - Separator between values. Defaults to `'|'`.
 	 * @returns Joined string of all values in the set.
 	 *
 	 * @example
-	 * DASHES.join() // '—|–|⸺|…'
-	 * DASHES.join('') // '—–⸺…'
+	 * DASHES.join() // '-|–|⸺|…'
+	 * DASHES.join('') // '-–⸺…'
 	 */
 	join(joiner?: string): string;
 
@@ -33,7 +33,7 @@ export type GlyphSet<T extends GlyphData = GlyphData> = {
 	 * Note: TypeScript types are not updated after insertion.
 	 * Use type casting if access to inserted keys is needed statically.
 	 *
-	 * @param entries — Key-value pairs to add to the set.
+	 * @param entries - Key-value pairs to add to the set.
 	 *
 	 * @example
 	 * DASHES.insert({ myDash: '\u2E1A' });
@@ -43,7 +43,7 @@ export type GlyphSet<T extends GlyphData = GlyphData> = {
 	/**
 	 * Checks whether a key exists in the glyph set.
 	 *
-	 * @param key — The key to look up.
+	 * @param key - The key to look up.
 	 * @returns `true` if the key is present, `false` otherwise.
 	 *
 	 * @example
@@ -55,7 +55,7 @@ export type GlyphSet<T extends GlyphData = GlyphData> = {
 	/**
 	 * Checks whether a value exists in the glyph set.
 	 *
-	 * @param value — The glyph value to search for.
+	 * @param value - The glyph value to search for.
 	 * @returns `true` if the value is present, `false` otherwise.
 	 *
 	 * @example
@@ -66,7 +66,7 @@ export type GlyphSet<T extends GlyphData = GlyphData> = {
 	/**
 	 * Returns the key associated with a given glyph value.
 	 *
-	 * @param value — The glyph value to look up.
+	 * @param value - The glyph value to look up.
 	 * @returns The corresponding key, or `undefined` if not found.
 	 *
 	 * @example
@@ -78,11 +78,11 @@ export type GlyphSet<T extends GlyphData = GlyphData> = {
 	/**
 	 * Returns the values associated with given keys.
 	 *
-	 * @param keys — The keys to look up.
+	 * @param keys - The keys to look up.
 	 * @returns An array of values, or `undefined` if not found.
 	 *
 	 * @example
-	 * DASHES.find('em', 'en') // ['—', '–']
+	 * DASHES.find('em', 'en') // ['-', '–']
 	 * DASHES.find('foo', 'bar') // undefined
 	 */
 	find(...keys: string[]): string[] | undefined;
@@ -91,7 +91,7 @@ export type GlyphSet<T extends GlyphData = GlyphData> = {
 /**
  * Structural contract for glyph sets used in generic contexts.
  *
- * Used where the concrete type parameter `T` is not available —
+ * Used where the concrete type parameter `T` is not available -
  * for example, as values inside `createCharacterSet` group maps.
  *
  * The index signature allows arbitrary string keys alongside
@@ -120,7 +120,7 @@ export interface GlyphSetInterface {
  * Provides locale-aware access to glyph groups via hierarchical resolution:
  * `common[key]` is merged with `locale[key]`, locale values taking precedence.
  *
- * @template T — The full character set structure, optionally containing a `common` group
+ * @template T - The full character set structure, optionally containing a `common` group
  * and one or more locale groups.
  */
 export interface ProtoSet<T extends { common?: Record<string, GlyphSetInterface> }> {
@@ -130,8 +130,8 @@ export interface ProtoSet<T extends { common?: Record<string, GlyphSetInterface>
 	 * Merges the `common[key]` group with `locale[key]`, with locale
 	 * values overriding common ones where keys collide.
 	 *
-	 * @param dataSet — Locale identifier (any key of `T` except `'common'`).
-	 * @param key — Group key present in `common` and/or the target locale.
+	 * @param dataSet - Locale identifier (any key of `T` except `'common'`).
+	 * @param key - Group key present in `common` and/or the target locale.
 	 * @returns Merged glyph set for the requested locale and group.
 	 *
 	 * @example
@@ -157,7 +157,7 @@ export interface ProtoSet<T extends { common?: Record<string, GlyphSetInterface>
 	/**
 	 * Checks whether a given group key exists in the character set.
 	 *
-	 * @param key — Group key to check.
+	 * @param key - Group key to check.
 	 * @returns `true` if the key is present, `false` otherwise.
 	 *
 	 * @example

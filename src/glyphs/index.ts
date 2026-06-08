@@ -33,8 +33,8 @@ const proto = {
  *
  * Used as the base building block for all character registries.
  *
- * @template T — Glyph dictionary shape
- * @param data — Raw glyph key-value map
+ * @template T - Glyph dictionary shape
+ * @param data - Raw glyph key-value map
  * @returns A glyph set with prototype methods enabled
  */
 export function createCharacters<T extends GlyphData>(data: T): GlyphSet<T> {
@@ -45,13 +45,13 @@ export function createCharacters<T extends GlyphData>(data: T): GlyphSet<T> {
  * Creates a prototype set for grouped glyph access.
  *
  * Provides a `get` method that merges:
- * — shared `common` glyphs
- * — locale-specific glyph overrides
+ * - shared `common` glyphs
+ * - locale-specific glyph overrides
  *
  * This enables hierarchical glyph resolution:
  * common → locale → final glyph set
  *
- * @template T — Structure containing optional `common` and locale groups
+ * @template T - Structure containing optional `common` and locale groups
  * @returns Prototype object with grouped access logic
  */
 export function createProtoSet<
@@ -77,17 +77,17 @@ export function createProtoSet<
  * Creates a full character registry with grouped access support.
  *
  * Combines:
- * — raw character data groups (e.g. common, en, ru, fr)
- * — prototype-based access layer
- * — hierarchical resolution via ProtoSet
+ * - raw character data groups (e.g. common, en, ru, fr)
+ * - prototype-based access layer
+ * - hierarchical resolution via ProtoSet
  *
  * This is the main entry point for building locale-aware
  * glyph/typography registries.
  *
- * @template T — Character set structure with optional `common` group
+ * @template T - Character set structure with optional `common` group
  * and locale-specific groups
  *
- * @param data — Structured glyph registry
+ * @param data - Structured glyph registry
  * @returns Character set with grouped access methods
  */
 export function createCharacterSet<
@@ -120,9 +120,9 @@ export const CHARACTERS = createCharacters({
  * Ligatures and extended typographic characters.
  *
  * These characters are used for:
- * — typographic replacement (fi → ﬁ)
- * — historical / extended Latin orthography
- * — improved text rendering in typography pipelines
+ * - typographic replacement (fi → ﬁ)
+ * - historical / extended Latin orthography
+ * - improved text rendering in typography pipelines
  */
 export const LIGATURES = createCharacters({
 	fi: '\uFB01', // fi
@@ -149,18 +149,18 @@ export const LIGATURES = createCharacters({
  * Typographic dash and hyphen variants.
  *
  * Includes:
- * — standard dashes (em/en)
- * — historical extended dashes
- * — soft hyphenation control
- * — non-breaking and figure-specific variants
+ * - standard dashes (em/en)
+ * - historical extended dashes
+ * - soft hyphenation control
+ * - non-breaking and figure-specific variants
  *
  * Used in:
- * — typography normalization
- * — text formatting pipelines
- * — language-specific hyphen rules
+ * - typography normalization
+ * - text formatting pipelines
+ * - language-specific hyphen rules
  */
 export const DASHES = createCharacters({
-	em: '\u2014', // — Em dash
+	em: '\u2014', // - Em dash
 	en: '\u2013', // – En dash
 	twoEm: '\u2E3A', // ⸺ Two-em dash
 	threeEm: '\u2E3B', // ⸻ Three-em dash
@@ -178,15 +178,15 @@ export const DASHES = createCharacters({
  * Typographic space characters used in advanced text formatting.
  *
  * This registry includes:
- * — standard Unicode spaces (en/em/etc.)
- * — punctuation and figure spacing
- * — zero-width and non-breaking variants
+ * - standard Unicode spaces (en/em/etc.)
+ * - punctuation and figure spacing
+ * - zero-width and non-breaking variants
  *
  * Used for:
- * — smart number formatting
- * — typography normalization
- * — locale-aware spacing rules
- * — text layout control
+ * - smart number formatting
+ * - typography normalization
+ * - locale-aware spacing rules
+ * - text layout control
  */
 export const SPACES = createCharacters({
 	_: '\u0020', // Space
@@ -211,12 +211,12 @@ export const SPACES = createCharacters({
  * Mathematical symbols used in typography processing.
  *
  * Includes:
- * — arithmetic operators (e.g. minus sign)
- * — mathematical punctuation (e.g. fraction slash)
+ * - arithmetic operators (e.g. minus sign)
+ * - mathematical punctuation (e.g. fraction slash)
  *
  * These characters are used for:
- * — normalization of math expressions
- * — typographic correction of ASCII math symbols
+ * - normalization of math expressions
+ * - typographic correction of ASCII math symbols
  */
 export const MATHS = createCharacters({
 	minus: '\u2212', // −
@@ -227,14 +227,14 @@ export const MATHS = createCharacters({
  * Temperature unit symbols in both scientific and typographic forms.
  *
  * Includes:
- * — SI and Unicode-prefixed temperature units (℃, ℉, K)
- * — textual temperature formats (°C, °F, etc.)
- * — historical and non-standard scale representations
+ * - SI and Unicode-prefixed temperature units (℃, ℉, K)
+ * - textual temperature formats (°C, °F, etc.)
+ * - historical and non-standard scale representations
  *
  * Used for:
- * — text normalization
- * — unit standardization
- * — scientific text formatting
+ * - text normalization
+ * - unit standardization
+ * - scientific text formatting
  */
 export const TEMPERATURES = createCharacters({
 	celsiusSolid: '\u2103', // ℃
@@ -257,18 +257,18 @@ export const TEMPERATURES = createCharacters({
  * Multi-language punctuation character registry.
  *
  * Organized by:
- * — common punctuation (shared across languages)
- * — language-specific punctuation rules (ru, en, fr, is)
+ * - common punctuation (shared across languages)
+ * - language-specific punctuation rules (ru, en, fr, is)
  *
  * Includes:
- * — quotes (outer / inner)
- * — inverted punctuation
- * — extended punctuation marks (medieval, interrobang, etc.)
+ * - quotes (outer / inner)
+ * - inverted punctuation
+ * - extended punctuation marks (medieval, interrobang, etc.)
  *
  * Used for:
- * — smart quote replacement
- * — typographic normalization
- * — locale-aware punctuation transformation
+ * - smart quote replacement
+ * - typographic normalization
+ * - locale-aware punctuation transformation
  */
 export const PUNCTUATION = createCharacterSet({
 	common: {
@@ -351,13 +351,13 @@ export const PUNCTUATION = createCharacterSet({
 
 /**
  * Numeric and numeral character set including:
- * — ASCII digits (0–9)
- * — Roman numeral Unicode characters (capital and small forms)
+ * - ASCII digits (0–9)
+ * - Roman numeral Unicode characters (capital and small forms)
  *
  * Used for:
- * — digit normalization
- * — roman numeral processing
- * — typography-aware number rendering
+ * - digit normalization
+ * - roman numeral processing
+ * - typography-aware number rendering
  */
 export const DIGITS = createCharacters({
 	zero: '0',
@@ -424,15 +424,15 @@ export const DIGITS = createCharacters({
  * Currency and monetary symbols registry.
  *
  * Includes:
- * — Unicode currency symbols (€, $, ₿, ₴, etc.)
- * — historical and regional currency signs
- * — roman and archaic monetary units
- * — ISO 4217 currency codes (e.g. USD, EUR, JPY)
+ * - Unicode currency symbols (€, $, ₿, ₴, etc.)
+ * - historical and regional currency signs
+ * - roman and archaic monetary units
+ * - ISO 4217 currency codes (e.g. USD, EUR, JPY)
  *
  * This registry is used for:
- * — currency normalization in text
- * — typography-aware financial formatting
- * — currency symbol replacement in parsed text
+ * - currency normalization in text
+ * - typography-aware financial formatting
+ * - currency symbol replacement in parsed text
  *
  * Note:
  * Some entries represent ISO codes rather than glyphs,

@@ -11,12 +11,12 @@ const EXPRESSIONS = {
  * Russian typography ruleset.
  *
  * Extends common rules with:
- * — Russian-style smart quotes
- * — spacing normalization for punctuation
- * — em-dash formatting rules
- * — currency formatting (RUB and others)
- * — abbreviation spacing rules
- * — grammatical particle spacing rules
+ * - Russian-style smart quotes
+ * - spacing normalization for punctuation
+ * - em-dash formatting rules
+ * - currency formatting (RUB and others)
+ * - abbreviation spacing rules
+ * - grammatical particle spacing rules
  *
  * Designed for Cyrillic text normalization.
  */
