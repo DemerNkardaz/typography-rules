@@ -43,6 +43,12 @@
       "types": "./dist/functions/index.d.ts",
       "import": "./dist/functions/index.mjs",
       "require": "./dist/functions/index.cjs"
+    },
+    "./style": {
+      "types": "./dist/style/index.d.ts",
+      "style": "./dist/style/main.css",
+      "import": "./dist/style/main.css",
+      "require": "./dist/style/main.css"
     }
   },
   "files": [

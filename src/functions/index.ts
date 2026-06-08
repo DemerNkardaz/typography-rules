@@ -4,3 +4,4 @@ export * from './clearSpaces';
 export * from './paragraph';
 export * from './wrapWithTag';
 export * from './rubyText';
+export * from './chemNotation';

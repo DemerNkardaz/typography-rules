@@ -1,5 +1,13 @@
 import type { Node, TagSettings, WrapWithTagsSettings } from '@/types';
 
+/**
+ * Parses text and wraps content found within specific markers into HTML tags.
+ * Supports nested structures by recursively calling itself.
+ * * @param text The input string to parse
+ * @param settings Configuration for the marker, tag type, and wrapper delimiters
+ * @param tagSettings Optional class name and attributes for the generated tag
+ * @returns An array of nodes representing the processed text and wrapped elements
+ */
 export function wrapWithTag(
 	text: string,
 	{ marker = '^', tag = 'sup', wrapper = ['[', ']'] }: WrapWithTagsSettings = {},

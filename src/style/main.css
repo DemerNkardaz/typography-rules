@@ -1,0 +1,16 @@
+.\@yalla-typography-ruby {
+  &.--alternate {
+    -webkit-ruby-position: alternate;
+    ruby-position: alternate;
+  }
+
+  &.--over {
+    -webkit-ruby-position: over;
+    ruby-position: over;
+  }
+
+  &.--under {
+    -webkit-ruby-position: under;
+    ruby-position: under;
+  }
+}

@@ -3,6 +3,12 @@ import type { ElementNode, HtmlNodeSettings, Node, TextNode } from '@/types';
 import type { Text } from 'mdast';
 import type { MdxJsxTextElement } from 'mdast-util-mdx-jsx';
 
+/**
+ * Parses a string into a tree of nodes based on a regular expression.
+ * * @param text The input string to parse
+ * @param settings Configuration containing the expression and a node factory function
+ * @returns An array of text and element nodes
+ */
 export function htmlNode(text: string, { expression, nodes }: HtmlNodeSettings = {}): Node[] {
 	if (!expression || !nodes) {
 		return [{ type: 'text', value: text }];
@@ -30,6 +36,11 @@ export function htmlNode(text: string, { expression, nodes }: HtmlNodeSettings =
 	return result;
 }
 
+/**
+ * Converts a node structure into an HTML string representation.
+ * * @param node The node to render
+ * @returns The resulting HTML string
+ */
 export function renderNode(node: Node): string {
 	if (node.type === 'text') {
 		return (node as TextNode).value;
@@ -55,10 +66,21 @@ export function renderNode(node: Node): string {
 	return `<${element.type}${attrString}>${inner}</${element.type}>`;
 }
 
+/**
+ * Renders an array of nodes into a single concatenated HTML string.
+ * * @param nodes Array of nodes to render
+ * @returns The resulting concatenated HTML string
+ */
 export function renderNodes(nodes: Node[]): string {
 	return nodes.map(renderNode).join('');
 }
 
+/**
+ * Transforms a custom node structure into an MDAST (Markdown Abstract Syntax Tree) element,
+ * specifically targeting MDX JSX syntax.
+ * * @param n The node to transform
+ * @returns An MDAST Text or MdxJsxTextElement node
+ */
 export function nodeToMdast(n: Node): Text | MdxJsxTextElement {
 	if (n.type === 'text') {
 		return {

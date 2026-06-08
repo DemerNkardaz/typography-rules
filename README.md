@@ -349,6 +349,9 @@ import { wrapWithTag } from '@yalla/typography-rules/functions';
 
 wrapWithTag('H[^2]O');
 // → [text('H'), sup([text('2')]), text('O')]
+
+wrapWithTag('H[*2]O', { marker: '*', tag: 'sup' });
+// → [text('H'), sup([text('2')]), text('O')]
 ```
 
 **Settings:**
@@ -392,6 +395,55 @@ rubyText('[:東|京][:とう|きょう]');
 | `wrapper` | `[string, string]` | `['[', ']']` | Bracket pair delimiting the ruby group                   |
 
 **Tag settings:** same as `wrapWithTag`.
+
+---
+
+### `chemNotation(text, settings?, tagSettings?)`
+
+Parses chemical notation syntax into MathML `<mmultiscripts>` node trees for
+correct rendering of nuclear/chemical scripts on both sides of a base symbol.
+Returns `Node[]`.
+
+```typescript
+import { chemNotation } from '@yalla/typography-rules/functions';
+
+chemNotation('Вода [%H(_2)-O]');
+chemNotation('[%(^14)(_6)C]');
+```
+
+**Syntax inside `[%…]`:**
+
+| Notation      | Meaning                                            |
+| ------------- | -------------------------------------------------- |
+| `(_val)`      | Subscript (lower index)                            |
+| `(^val)`      | Superscript (upper index)                          |
+| Before base   | Left-side prescripts (e.g. `(^14)C`)               |
+| After base    | Right-side scripts (e.g. `C(_6)`)                  |
+| `-` separator | Joins multiple parts in one block (e.g. `H(_2)-O`) |
+
+**Settings:**
+
+| Option    | Type               | Default      | Description                                         |
+| --------- | ------------------ | ------------ | --------------------------------------------------- |
+| `marker`  | `string`           | `'%'`        | Character after opening bracket                     |
+| `wrapper` | `[string, string]` | `['[', ']']` | Bracket pair delimiting the chemical notation block |
+
+**Tag settings:** same as `wrapWithTag`.
+
+**Examples:**
+
+```
+[%H(_2)-O]            →  H₂O
+[%NH(_4)-ClO(_4)]     →  NH₄ClO₄
+[%(^239)U]            →  ²³⁹U
+[%(^14)(_6)C]         →  ¹⁴₆C
+[%(^2)(_1)H(^7)(_5)]  →  ²₁H⁷₅  (left: 2,1 — right: 7,5)
+```
+
+> **Note on font styling:** MathML ignores `font-family` and `font-style`. Use a
+> math-capable OpenType font (e.g. STIX Two Math, Latin Modern Math) via
+> `@font-face` on the `math` element. To suppress automatic italicisation of
+> `<mi>`, pass `attrs: { mathvariant: 'normal' }` via `tagSettings`.
 
 ---
 
@@ -534,7 +586,10 @@ splitNodes(processed, nodes); // writes segments back to nodes
 | `/common/typography/apostrophe`             | Straight apostrophe (`'`)                                            | `'`                        | Replaces with Unicode right single quotation mark `'` (`\u2019`), weight `200`         |
 | `/common/wraps/sup`                         | `[^…]` marker syntax                                                 | `<sup>` node               | Wraps bracket-marker content in a superscript element via `wrapWithTag`                |
 | `/common/wraps/sub`                         | `[_…]` marker syntax                                                 | `<sub>` node               | Wraps bracket-marker content in a subscript element via `wrapWithTag`                  |
-| `/common/wraps/ruby`                        | `[:base\|…][:annotation\|…]` syntax                                  | `<ruby>` node tree         | Parses ruby annotation pairs into `<ruby><rb/><rt/></ruby>` via `rubyText`             |
+| `/common/wraps/chem`                        | `[%…]` marker syntax                                                 | `<math>` node tree         | Parses chemical notation into MathML `<mmultiscripts>` via `chemNotation`              |
+| `/common/wraps/ruby` (`:`)                  | `[:base\|…][:annotation\|…]` syntax                                  | `<ruby>` node tree         | Ruby annotation above the base (`--over`), via `rubyText`                              |
+| `/common/wraps/ruby` (`?:`)                 | `[?:base\|…][?:annotation\|…]` syntax                                | `<ruby>` node tree         | Alternate ruby style (`--alternate`), via `rubyText`                                   |
+| `/common/wraps/ruby` (`!:`)                 | `[!:base\|…][!:annotation\|…]` syntax                                | `<ruby>` node tree         | Ruby annotation below the base (`--under`), via `rubyText`                             |
 | `/common/typography/runt`                   | Short last word(s) in a paragraph                                    | Preceding space → `\u00A0` | Prevents typographic runts. Weight: `Infinity` — always runs last                      |
 
 ---
@@ -617,6 +672,7 @@ import type {
   HtmlNodeSettings,
   WrapWithTagsSettings,
   RubyTextSettings,
+  ChemNotationSettings,
   TagSettings,
 } from '@yalla/typography-rules';
 ```

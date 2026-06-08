@@ -47,6 +47,7 @@ export type RegExpTransformRule = BaseRule & {
  *
  * Used for complex transformations that cannot be expressed with RegExp.
  *
+ * @property label — Descriptive name of the function rule
  * @property kind — Rule type identifier ("function")
  * @property rule — Function applied to full text input
  * @property args — Optional arguments passed to the rule function
@@ -61,17 +62,26 @@ export type FunctionRule<
 	args: TArgs;
 };
 
+/**
+ * Typography rule that transforms RegExp matches into DOM/Tree nodes.
+ *
+ * @property label — Descriptive name of the node rule
+ * @property kind — Rule type identifier ("node")
+ * @property rule — Regular expression used for matching text
+ * @property nodes — Function that maps a RegExp match to a Node structure
+ */
 export type NodeFunctionRule = BaseRule & {
 	label: string;
 	kind: 'node';
 	rule: RegExp;
 	nodes: (match: RegExpExecArray) => Node;
 };
+
 /**
  * Generic typography processing function signature.
  *
  * Accepts a text input and optional additional arguments,
- * and returns a transformed string.
+ * and returns a transformed string or a set of nodes.
  */
 export type RuleFunction = (text: string, ...args: never[]) => string | Node[];
 
@@ -82,14 +92,29 @@ export type RuleFunction = (text: string, ...args: never[]) => string | Node[];
  * — RegExp-based replacement rules
  * — RegExp-based transform rules
  * — Function-based rules
+ * — Node-based rules
  */
 export type Rule = RegExpReplaceRule | RegExpTransformRule | FunctionRule | NodeFunctionRule;
 
+/**
+ * Represents a basic text leaf node in the document structure.
+ *
+ * @property type — Node discriminator ("text")
+ * @property value — The raw text content
+ */
 export interface TextNode {
 	type: 'text';
 	value: string;
 }
 
+/**
+ * Represents an element node containing children in the document structure.
+ *
+ * @property type — The element tag or identifier
+ * @property className — Optional CSS class for the element
+ * @property attrs — Optional key-value map of HTML attributes
+ * @property children — Array of child nodes
+ */
 export interface ElementNode {
 	type: string;
 	className?: string;
@@ -97,6 +122,9 @@ export interface ElementNode {
 	children: Node[];
 }
 
+/**
+ * Union type representing a node within the document tree.
+ */
 export type Node = TextNode | ElementNode;
 
 // Function’s types
@@ -121,7 +149,7 @@ export interface QuoteSettings {
  *
  * @property minLength — Minimum digit length required to apply spacing
  * @property separateFloat — Whether to format fractional parts separately
- * @property spaceCharacter — Character used as a spacing separator
+ * @property separator — Character used as a spacing separator
  */
 export interface NumberSpaceSettings {
 	minLength?: number;
@@ -149,22 +177,53 @@ export interface RuntSettings {
 	space?: Spaces | string;
 }
 
+/**
+ * Configuration for rules that convert text matches into HTML structures.
+ *
+ * @property expression — RegExp used to identify target text
+ * @property nodes — Factory function to generate Node structures from matches
+ */
 export interface HtmlNodeSettings {
 	expression?: RegExp;
 	nodes?: (match: RegExpExecArray) => Node;
 }
 
-export interface WrapWithTagsSettings {
+/**
+ * Base configuration for text wrappers.
+ *
+ * @property marker — String used to identify the wrap boundaries
+ * @property wrapper — The opening and closing strings to wrap text with
+ */
+export interface WrapperBaseSettings {
 	marker?: string;
+	wrapper?: [string, string];
+}
+
+/**
+ * Settings for wrapping text within specific HTML tags.
+ *
+ * @property tag — The HTML tag to use for wrapping
+ */
+export interface WrapWithTagsSettings extends WrapperBaseSettings {
 	tag?: string;
-	wrapper?: [string, string];
 }
 
-export interface RubyTextSettings {
-	marker?: string;
-	wrapper?: [string, string];
-}
+/**
+ * Settings for ruby annotation text formatting.
+ */
+export type RubyTextSettings = WrapperBaseSettings;
 
+/**
+ * Settings for chemical notation formatting.
+ */
+export type ChemNotationSettings = WrapperBaseSettings;
+
+/**
+ * General configuration for HTML tag output.
+ *
+ * @property className — CSS class to apply to the generated tag
+ * @property attrs — Additional HTML attributes for the generated tag
+ */
 export interface TagSettings {
 	className?: string;
 	attrs?: Record<string, string>;

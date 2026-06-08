@@ -1,5 +1,5 @@
 import { newRule } from '@/api';
-import { clearSpaces, rubyText, runt, wrapWithTag } from '@/functions';
+import { chemNotation, clearSpaces, rubyText, runt, wrapWithTag } from '@/functions';
 import { MATHS, DASHES, PUNCTUATION, RANGES } from '@/glyphs';
 
 const RAW = {
@@ -53,6 +53,24 @@ export default [
 	),
 
 	// HTML Wraps
+
+	// Chemical
+	newRule('/common/wraps/chem', chemNotation, [{ className: '@yalla-typography-chem' }]),
+
+	// Wraps for ルビ, furigana
+	newRule('/common/wraps/ruby', rubyText, [
+		{ marker: '?:' },
+		{ className: '@yalla-typography-ruby --alternate' },
+	]),
+	newRule('/common/wraps/ruby', rubyText, [
+		{ marker: '!:' },
+		{ className: '@yalla-typography-ruby --under' },
+	]),
+	newRule('/common/wraps/ruby', rubyText, [
+		{ marker: ':' },
+		{ className: '@yalla-typography-ruby --over' },
+	]),
+
 	// Wraps for superscript and subscript
 	newRule('/common/wraps/sup', wrapWithTag, [
 		{ marker: '^', tag: 'sup' },
@@ -61,12 +79,6 @@ export default [
 	newRule('/common/wraps/sub', wrapWithTag, [
 		{ marker: '_', tag: 'sub' },
 		{ className: '@yalla-typography-sub' },
-	]),
-
-	// Wraps for ルビ, furigana
-	newRule('/common/wraps/ruby', rubyText, [
-		{ marker: ':' },
-		{ className: '@yalla-typography-ruby' },
 	]),
 
 	// Generic Typography

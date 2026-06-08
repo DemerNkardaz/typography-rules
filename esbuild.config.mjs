@@ -45,6 +45,14 @@ const common = {
 	tsconfig: 'tsconfig.build.json',
 };
 
+await build({
+	...common,
+	entryPoints: ['src/style/main.css'],
+	outfile: 'dist/style/main.css',
+	loader: { '.css': 'css' },
+	bundle: true,
+});
+
 const glyphsMJS = await build({
 	...common,
 	entryPoints: ['src/glyphs/index.ts'],
