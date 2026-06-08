@@ -1,5 +1,5 @@
 import { newRule } from '@/api';
-import { clearSpaces, runt, wrapWithTag } from '@/functions';
+import { clearSpaces, rubyText, runt, wrapWithTag } from '@/functions';
 import { MATHS, DASHES, PUNCTUATION, RANGES } from '@/glyphs';
 
 const RAW = {
@@ -59,6 +59,10 @@ export default [
 	newRule('/common/wraps/sub', wrapWithTag, [
 		{ marker: '_', tag: 'sub' },
 		{ className: '@yalla-typography-sub' },
+	]),
+	newRule('/common/wraps/ruby', rubyText, [
+		{ marker: ':' },
+		{ className: '@yalla-typography-ruby' },
 	]),
 
 	// Generic Typography

@@ -160,6 +160,11 @@ export interface wrapWithTagsSettings {
 	wrapper?: [string, string];
 }
 
+export interface rubyTextSettings {
+	marker?: string;
+	wrapper?: [string, string];
+}
+
 export interface tagSettings {
 	className?: string;
 	attrs?: Record<string, string>;
