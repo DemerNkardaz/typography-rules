@@ -1,10 +1,16 @@
 import { newRule } from '@/api';
 import { clearSpaces, runt } from '@/functions';
-import { MATHS, DASHES, PUNCTUATION, RANGES } from '@/glyphs';
+import { MATHS, DASHES, PUNCTUATION, RANGES, BRACKETS, WALLET } from '@/glyphs';
 
 const RAW = {
 	numerals: `[${RANGES.common.DIGITS.join('')}]+`,
-	interNumber: `[${MATHS.minus}${DASHES.en}]`,
+	interNumber: `[${MATHS.minus + DASHES.en}]`,
+	walletSymbols: `${WALLET.SYMBOL.values()
+		.map((s) => RegExp.escape(s))
+		.join('|')}`,
+	walletISO: `${WALLET.ISO.join('|')}`,
+	leftBrackets: `${RegExp.escape(BRACKETS.common.left.join(''))}`,
+	rightBrackets: `${RegExp.escape(BRACKETS.common.right.join(''))}`,
 } as const;
 
 export const PARTS = {
@@ -14,8 +20,12 @@ export const PARTS = {
 
 export const EXPRESSIONS = {
 	numeralsRange: new RegExp(`(${PARTS.numerals})-(${PARTS.numerals})`, 'g'),
-	ellipsisRange: new RegExp(`${PARTS.number}${PARTS.interNumber}${PARTS.number}`, 'g'),
+	ellipsisRange: new RegExp(`${PARTS.number + PARTS.interNumber + PARTS.number}`, 'g'),
 	multipleEllipsis: new RegExp(`${PUNCTUATION.common.rightSided.ellipsis}{2,}`, 'g'),
+	walletSymbolBeforeValue: new RegExp(`(${PARTS.walletSymbols})\\s*(\\d[\\d.]*)`, 'g'),
+	walletSymbolAfterValue: new RegExp(`(\\d+)\\s*(${PARTS.walletSymbols})`, 'g'),
+	walletISOBeforeValue: new RegExp(`(${PARTS.walletISO})\\s*(\\d[\\d.]*)`, 'g'),
+	walletISOAfterValue: new RegExp(`(\\d+)\\s*(${PARTS.walletISO})`, 'g'),
 } as const;
 
 /**
@@ -40,14 +50,14 @@ export default [
 
 	// Math
 	// Minus sign for negative numbers
-	newRule('/common/math/negative-number', /(?<!\d)-(\d+)/g, `${MATHS.minus}$1`),
+	newRule('/common/number/negative', /(?<!\d)-(\d+)/g, `${MATHS.minus}$1`),
 
 	// En dash for ranges, e.g. 1–2
-	newRule('/common/math/number-range/default', EXPRESSIONS.numeralsRange, `$1${DASHES.en}$2`),
+	newRule('/common/number/range/default', EXPRESSIONS.numeralsRange, `$1${DASHES.en}$2`),
 
 	// Ellipsis for ranges, e.g. −2…3
 	newRule(
-		'/common/math/number-range/ellipsis',
+		'/common/number/range/ellipsis',
 		EXPRESSIONS.ellipsisRange,
 		`$1${PUNCTUATION.common.rightSided.ellipsis}$2`
 	),

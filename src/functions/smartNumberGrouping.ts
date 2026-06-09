@@ -29,7 +29,7 @@ export function smartNumberGrouping(
 	{ minLength = 5, separateFloat = false, separator = SPACES.noBreak }: NumberSpaceSettings = {}
 ): string {
 	return text.replace(
-		/(?<![a-zA-Zа-яА-ЯёЁ\d])([+\-\u2212]?)(\d[\d\u00A0]*)([.,]\d+)?(?!\d)/g,
+		/(?<![\p{L}\d])([+\-\u2212]?)(\d(?:[\u00A0]?\d)*)([.,]\d+)?(?!\d)/gu,
 		(match, sign: string, rawInt: string, floatPart: string | undefined) => {
 			const intPart = rawInt.replace(/\u00A0/g, '');
 

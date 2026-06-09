@@ -15,6 +15,7 @@ export type GlyphData = Record<string, string>;
 export type GlyphSet<T extends GlyphData = GlyphData> = {
 	[K in keyof T]: T[K];
 } & {
+	values(this: GlyphSet<T>): string[];
 	/**
 	 * Joins all glyph values into a single string.
 	 *
@@ -106,6 +107,7 @@ export interface GlyphSetInterface {
 		| ((value: string) => boolean)
 		| ((value: string) => string | undefined)
 		| ((...keys: string[]) => string[] | undefined);
+	values(): string[];
 	join(joiner?: string): string;
 	insert(entries: GlyphData): void;
 	hasKey(key: string): boolean;

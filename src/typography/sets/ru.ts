@@ -1,9 +1,18 @@
 import { newRule } from '@/api';
 import { smartNumberGrouping, smartQuotes } from '@/functions';
-import { CHARACTERS, PUNCTUATION, SPACES } from '@/glyphs';
-import { PARTS } from './common';
+import { CHARACTERS, PUNCTUATION, SPACES, WALLET } from '@/glyphs';
+import { PARTS as COMMON_PARTS, EXPRESSIONS as COMMON_EXPRESSIONS } from './common';
+
+const RAW = {
+	...COMMON_PARTS,
+};
+
+const PARTS = {
+	...RAW,
+};
 
 const EXPRESSIONS = {
+	...COMMON_EXPRESSIONS,
 	numeroNumeral: new RegExp(`(${CHARACTERS.numero})\\s+(${PARTS.numerals})`, 'g'),
 };
 
@@ -21,8 +30,31 @@ const EXPRESSIONS = {
  * Designed for Cyrillic text normalization.
  */
 export default [
+	newRule(
+		'/russian/currency/rub-to-symbol',
+		/(\d+)\s*(?:руб(?:л[её]й|ля|\.?)|р\.?)/gi,
+		`$1${SPACES.noBreak + WALLET.SYMBOL.ruble}`
+	),
+	newRule('/english/currency/wallet-symbol-flip', EXPRESSIONS.walletSymbolBeforeValue, `$2$1`),
+	newRule('/russian/currency/wallet-iso-flip', EXPRESSIONS.walletISOBeforeValue, `$2$1`),
+	newRule(
+		'/russian/currency/wallet-symbol-value',
+		EXPRESSIONS.walletSymbolAfterValue,
+		`$1${SPACES.noBreak}$2`
+	),
+	newRule(
+		'/russian/currency/wallet-iso-value',
+		EXPRESSIONS.walletISOAfterValue,
+		`$1${SPACES.noBreak}$2`
+	),
+
 	newRule('/russian/number/groups', smartNumberGrouping, [{ separator: SPACES.noBreak }]),
-	newRule('/russian/number/numero-sign', EXPRESSIONS.numeroNumeral, `$1${SPACES.noBreakNarrow}$2`),
+	newRule('/russian/number/normalize-dot-comma', /(\d+)\.(\d+)/g, '$1,$2'),
+	newRule(
+		'/russian/number/numero-sign-value',
+		EXPRESSIONS.numeroNumeral,
+		`$1${SPACES.noBreakNarrow}$2`
+	),
 	newRule(
 		'/russian/typography/quotes',
 		smartQuotes,

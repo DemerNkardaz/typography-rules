@@ -3,6 +3,9 @@ import type { GlyphStringMap, GlyphData, GlyphSet, GlyphSetInterface, ProtoSet }
 export type * from './types';
 
 const proto = {
+	values(this: GlyphStringMap): string[] {
+		return Object.values(this);
+	},
 	join(this: GlyphStringMap, joiner = '|'): string {
 		return Object.values(this).join(joiner);
 	},
@@ -349,6 +352,21 @@ export const PUNCTUATION = createCharacterSet({
 	},
 });
 
+export const BRACKETS = createCharacterSet({
+	common: {
+		left: createCharacters({
+			round: '(',
+			square: '[',
+			curly: '{',
+		} as const),
+		right: createCharacters({
+			round: ')',
+			square: ']',
+			curly: '}',
+		} as const),
+	},
+});
+
 /**
  * Numeric and numeral character set including:
  * - ASCII digits (0–9)
@@ -438,141 +456,145 @@ export const DIGITS = createCharacters({
  * Some entries represent ISO codes rather than glyphs,
  * depending on context of usage in formatting pipelines.
  */
-export const WALLET = createCharacters({
-	// symbols
-	anis: '\u00A4', // ¤
-	european_currency_unit: '\u20A0', // ₠
-	austral: '\u20B3', // ₳
-	cent: '\u00A2', // ¢
-	cedi: '\u20B5', // ₵
-	colon: '\u20A1', // ₡
-	dollar: '\\$',
-	drachma: '\u20AF', // ₯
-	dram: '\u058F', // ֏
-	doromi: '\u07FE',
+export const WALLET = {
+	SYMBOL: createCharacters({
+		// symbols
+		anis: '\u00A4', // ¤
+		european_currency_unit: '\u20A0', // ₠
+		austral: '\u20B3', // ₳
+		cent: '\u00A2', // ¢
+		cedi: '\u20B5', // ₵
+		colon: '\u20A1', // ₡
+		dollar: '$',
+		drachma: '\u20AF', // ₯
+		dram: '\u058F', // ֏
+		doromi: '\u07FE',
 
-	euro: '\u20AC', // €
-	franc: '\u20A3', // ₣
-	guarani: '\u20B2', // ₲
-	kip: '\u20AD', // ₭
-	lari: '\u20BE', // ₾
-	naira: '\u20A6', // ₦
-	pound: '\u00A3', // £
-	tournois: '\u20B6', // ₶
-	spesmillo: '\u20B7', // ₷
-	ruble_symbol: '\u20BD', // ₽
+		euro: '\u20AC', // €
+		franc: '\u20A3', // ₣
+		guarani: '\u20B2', // ₲
+		kip: '\u20AD', // ₭
+		lari: '\u20BE', // ₾
+		naira: '\u20A6', // ₦
+		pound: '\u00A3', // £
+		tournois: '\u20B6', // ₶
+		spesmillo: '\u20B7', // ₷
+		ruble: '\u20BD', // ₽
 
-	hryvnia: '\u20B4', // ₴
-	lira: '\u20A4', // ₤
-	lira_turkish: '\u20BA', // ₺
-	baht: '\u0E3F', // ฿
-	rupee: '\u20B9', // ₹
-	won: '\u20A9', // ₩
-	yen: '\u00A5', // ¥
-	yen_kanji: '\u5186', // 円
-	yuan_hanzi: '\u5143', // 元
-	dong: '\u20AB', // ₫
-	tugrik: '\u20AE', // ₮
+		hryvnia: '\u20B4', // ₴
+		lira: '\u20A4', // ₤
+		lira_turkish: '\u20BA', // ₺
+		baht: '\u0E3F', // ฿
+		rupee: '\u20B9', // ₹
+		won: '\u20A9', // ₩
+		yen: '\u00A5', // ¥
+		yen_kanji: '\u5186', // 円
+		yuan_hanzi: '\u5143', // 元
+		dong: '\u20AB', // ₫
+		tugrik: '\u20AE', // ₮
 
-	tenge: '\u20B8', // ₸
-	shekel: '\u20AA', // ₪
-	manat: '\u20BC', // ₼
-	rupee_alt: '\u20A8', // ₨
-	peseta: '\u20A7', // ₧
-	peso: '\u20B1', // ₱
-	riyal: '\uFDFC',
-	bitcoin_symbol: '\u20BF', // ₿
+		tenge: '\u20B8', // ₸
+		shekel: '\u20AA', // ₪
+		manat: '\u20BC', // ₼
+		rupee_alt: '\u20A8', // ₨
+		peseta: '\u20A7', // ₧
+		peso: '\u20B1', // ₱
+		riyal: '\uFDFC',
+		bitcoin_symbol: '\u20BF', // ₿
 
-	taka: '\u09F3', // ৳
-	tamil_rupee: '\u0BF9', // ௹
-	sinhala_rupee: '\u0DBB\u0DD4', // රු
+		taka: '\u09F3', // ৳
+		tamil_rupee: '\u0BF9', // ௹
+		sinhala_rupee: '\u0DBB\u0DD4', // රු
 
-	roman_sextans: '\u{10190}',
-	roman_uncia: '\u{10191}',
-	roman_semuncia: '\u{10192}',
-	roman_sextula: '\u{10193}',
-	roman_dimida_sextula: '\u{10194}',
-	roman_siliqua: '\u{10195}',
-	roman_denarius: '\u{10196}',
-	roman_quinarius: '\u{10197}',
-	roman_sestertius: '\u{10198}',
-	roman_dupondius: '\u{10199}',
-	roman_as: '\u{1019A}',
+		roman_sextans: '\u{10190}',
+		roman_uncia: '\u{10191}',
+		roman_semuncia: '\u{10192}',
+		roman_sextula: '\u{10193}',
+		roman_dimida_sextula: '\u{10194}',
+		roman_siliqua: '\u{10195}',
+		roman_denarius: '\u{10196}',
+		roman_quinarius: '\u{10197}',
+		roman_sestertius: '\u{10198}',
+		roman_dupondius: '\u{10199}',
+		roman_as: '\u{1019A}',
+	} as const),
 
-	// codes / ISO / crypto
-	rub: 'RUB',
-	usd: 'USD',
-	eur: 'EUR',
-	gbp: 'GBP',
-	jpy: 'JPY',
-	chf: 'CHF',
-	cad: 'CAD',
-	aud: 'AUD',
-	nzd: 'NZD',
-	pln: 'PLN',
-	huf: 'HUF',
+	ISO: createCharacters({
+		// codes / ISO / crypto
+		rub: 'RUB',
+		usd: 'USD',
+		eur: 'EUR',
+		gbp: 'GBP',
+		jpy: 'JPY',
+		chf: 'CHF',
+		cad: 'CAD',
+		aud: 'AUD',
+		nzd: 'NZD',
+		pln: 'PLN',
+		huf: 'HUF',
 
-	brl: 'BRL',
-	cny: 'CNY',
-	twd: 'TWD',
-	sgd: 'SGD',
-	myr: 'MYR',
-	idr: 'IDR',
-	thb: 'THB',
-	vnd: 'VND',
-	krw: 'KRW',
-	pkr: 'PKR',
+		brl: 'BRL',
+		cny: 'CNY',
+		twd: 'TWD',
+		sgd: 'SGD',
+		myr: 'MYR',
+		idr: 'IDR',
+		thb: 'THB',
+		vnd: 'VND',
+		krw: 'KRW',
+		pkr: 'PKR',
 
-	inr: 'INR',
-	ils: 'ILS',
-	qar: 'QAR',
-	sar: 'SAR',
-	aed: 'AED',
-	omr: 'OMR',
-	yem: 'YER',
-	jod: 'JOD',
-	iqd: 'IQD',
-	kwd: 'KWD',
+		inr: 'INR',
+		ils: 'ILS',
+		qar: 'QAR',
+		sar: 'SAR',
+		aed: 'AED',
+		omr: 'OMR',
+		yem: 'YER',
+		jod: 'JOD',
+		iqd: 'IQD',
+		kwd: 'KWD',
 
-	bhd: 'BHD',
-	tnd: 'TND',
-	egp: 'EGP',
-	syp: 'SYP',
-	lbp: 'LBP',
-	czk: 'CZK',
-	sek: 'SEK',
-	nok: 'NOK',
-	dkk: 'DKK',
-	hrk: 'HRK',
+		bhd: 'BHD',
+		tnd: 'TND',
+		egp: 'EGP',
+		syp: 'SYP',
+		lbp: 'LBP',
+		czk: 'CZK',
+		sek: 'SEK',
+		nok: 'NOK',
+		dkk: 'DKK',
+		hrk: 'HRK',
 
-	rsd: 'RSD',
-	bgn: 'BGN',
-	ron: 'RON',
-	uah: 'UAH',
-	kzt: 'KZT',
-	gel: 'GEL',
-	amd: 'AMD',
-	mxn: 'MXN',
-	clp: 'CLP',
-	cop: 'COP',
+		rsd: 'RSD',
+		bgn: 'BGN',
+		ron: 'RON',
+		uah: 'UAH',
+		kzt: 'KZT',
+		gel: 'GEL',
+		amd: 'AMD',
+		mxn: 'MXN',
+		clp: 'CLP',
+		cop: 'COP',
 
-	ars: 'ARS',
-	zar: 'ZAR',
-	try: 'TRY',
-	php: 'PHP',
-	ngn: 'NGN',
+		ars: 'ARS',
+		zar: 'ZAR',
+		try: 'TRY',
+		php: 'PHP',
+		ngn: 'NGN',
 
-	lkr: 'LKR',
-	bdt: 'BDT',
+		lkr: 'LKR',
+		bdt: 'BDT',
 
-	usdt: 'USDT',
-	btc: 'BTC',
-	eth: 'ETH',
-	xrp: 'XRP',
-	sol: 'SOL',
-	bnb: 'BNB',
-	usdc: 'USDC',
-} as const);
+		usdt: 'USDT',
+		btc: 'BTC',
+		eth: 'ETH',
+		xrp: 'XRP',
+		sol: 'SOL',
+		bnb: 'BNB',
+		usdc: 'USDC',
+	} as const),
+};
 
 export const RANGES = createCharacterSet({
 	common: {
@@ -608,8 +630,11 @@ export type Temperature = GlyphValues<typeof TEMPERATURES>;
 
 export type Punctuation = GlyphGroupValues<typeof PUNCTUATION>;
 
+export type Brackets = GlyphGroupValues<typeof BRACKETS>;
+
 export type Digits = GlyphGroupValues<typeof DIGITS>;
 
-export type Wallet = GlyphValues<typeof WALLET>;
+export type WalletSymbols = GlyphValues<typeof WALLET.SYMBOL>;
+export type WalletISO = GlyphValues<typeof WALLET.ISO>;
 
 export type Ranges = GlyphGroupValues<typeof RANGES>;
