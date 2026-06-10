@@ -208,6 +208,24 @@ export interface WrapWithTagsSettings extends WrapperBaseSettings {
 	tag?: string;
 }
 
+// types.ts
+
+/**
+ * Settings for wrapping text matched by a custom RegExp into an HTML tag.
+ *
+ * @property expression - RegExp used to identify target text
+ * @property tag - The HTML tag to use for wrapping
+ * @property placement - Optional template string defining where the tag is inserted.
+ * Uses `$1`, `$2`, etc. as capture group references and `<TAG>...</TAG>` to mark
+ * the wrapped region. When omitted, the entire match is wrapped.
+ * Example: `'$1<TAG>$2</TAG>'` wraps only the second capture group.
+ */
+export interface WrapWithTagExpressionSettings {
+	expression: RegExp;
+	tag?: string;
+	placement?: string;
+}
+
 /**
  * Settings for ruby annotation text formatting.
  */

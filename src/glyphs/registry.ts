@@ -24,6 +24,8 @@ export const CHARACTERS = createCharacters({
 	registered: '\u00AE', // ®
 	copyright: '\u00A9', // ©
 	copyleft: '\u{1F12F}', // 🄯
+	middleDot: '\u00B7', // ·
+	dotOperator: '\u22C5', // ⋅
 } as const);
 
 /**
