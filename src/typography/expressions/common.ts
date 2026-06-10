@@ -10,6 +10,21 @@ export const PARTS = {
 	leftBrackets: RegExp.escape(BRACKETS.common.left.join('')),
 	rightBrackets: RegExp.escape(BRACKETS.common.right.join('')),
 	percentLike: '[' + CHARACTERS.find('percent', 'permil', 'perTenThousand')?.join('') + ']',
+	expressivePunctuation:
+		'[' +
+		PUNCTUATION.common.rightSided
+			.find(
+				'exclamation',
+				'doubleExclamation',
+				'exclamationQuestion',
+				'question',
+				'doubleQuestion',
+				'questionExclamation',
+				'reversedQuestion',
+				'interrobang'
+			)
+			?.join('') +
+		']',
 
 	get number(): string {
 		const value = `([${MATHS.minus}]?${PARTS.numerals})`;
@@ -27,6 +42,14 @@ export const EXPRESSIONS = {
 	walletSymbolAfterValue: new RegExp(`(\\d+)\\s*(${PARTS.walletSymbols})`, 'g'),
 	walletISOBeforeValue: new RegExp(`(${PARTS.walletISO})\\s*(\\d[\\d.]*)`, 'g'),
 	walletISOAfterValue: new RegExp(`(\\d+)\\s*(${PARTS.walletISO})`, 'g'),
+	expressiveAposiopesis: new RegExp(
+		`(${PARTS.expressivePunctuation})\\s*(?:${PUNCTUATION.common.rightSided.ellipsis}|\\.{1,})[.${PUNCTUATION.common.rightSided.ellipsis}]*`,
+		'g'
+	),
+	backwardsExpressiveAposiopesis: new RegExp(
+		`(?:${PUNCTUATION.common.rightSided.ellipsis}|\\.{1,})[.${PUNCTUATION.common.rightSided.ellipsis}]*\\s*(${PARTS.expressivePunctuation})`,
+		'g'
+	),
 } as const;
 
 export default EXPRESSIONS;

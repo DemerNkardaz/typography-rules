@@ -43,6 +43,16 @@ export default [
 		100
 	),
 	newRule(
+		'/english/punctuation/dot-before-expression',
+		EXPRESSIONS.expressiveAposiopesis,
+		PUNCTUATION.common.rightSided.ellipsis + '$1'
+	),
+	newRule(
+		'/english/punctuation/dot-before-expression',
+		EXPRESSIONS.backwardsExpressiveAposiopesis,
+		PUNCTUATION.common.rightSided.ellipsis + '$1'
+	),
+	newRule(
 		'/english/punctuation/invalid-spacing',
 		EXPRESSIONS.invalidPunctuationSpacing,
 		NONE,

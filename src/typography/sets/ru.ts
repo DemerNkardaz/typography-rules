@@ -69,7 +69,7 @@ export default [
 
 	newRule('/russian/symbol/numero/value', EXPRESSIONS.numeroNumeral, `$1${SPACES.noBreakNarrow}$2`),
 	newRule(
-		'/russian/typography/quotes',
+		'/russian/punctuation/quotes',
 		smartQuotes,
 		[
 			{
@@ -80,6 +80,12 @@ export default [
 		100
 	),
 	newRule('/russian/punctuation/dot-after-quote', /\.»/g, '».', 1000),
+	newRule(
+		'/russian/punctuation/dot-after-expression',
+		EXPRESSIONS.backwardsExpressiveAposiopesis,
+		'$1..'
+	),
+	newRule('/russian/punctuation/dot-after-expression', EXPRESSIONS.expressiveAposiopesis, '$1..'),
 	/*
 	// Adds a non-breaking space as a thousands separator, e.g. 1 234 567
 	// Добавляет неразрывный пробел в качестве разделителя разрядов чисел

@@ -9,6 +9,7 @@ import type { Spaces } from '@/glyphs';
  * Lower values are executed earlier.
  */
 export interface BaseRule {
+	label: string;
 	weight?: number;
 }
 
