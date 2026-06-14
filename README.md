@@ -41,7 +41,7 @@ import { initTypographyRules, getWeightedRules } from '@yalla/typography-rules';
 // Register all built-in rule groups (common, ru, en, …)
 initTypographyRules();
 
-// Register all built-in rules for makrup, e.g. [^text] → <sup>text</sup>
+// Register all built-in rules for markup, e.g. [^text] → <sup>text</sup>
 initMarkupRules();
 
 // Or apply only a specific locale group
@@ -116,10 +116,6 @@ newRule('/my/rule/label', myFunction, ['arg1', 'arg2']);
 | `rule`    | `RegExp \| RuleFunction`           | Pattern or processing function                                                                                           |
 | `second`  | `string \| transform fn \| args[]` | Replacement, transformer, or arguments                                                                                   |
 | `weight`  | `number`                           | Execution priority — lower values run first (default: `0`)                                                               |
-
-> **Note:** `NodeFunctionRule` (`kind: 'node'`) is defined in types but is not
-> yet creatable via `newRule`. Node-returning functions are registered as
-> `FunctionRule` and resolved at pipeline level by the consuming plugin.
 
 ---
 
@@ -551,6 +547,44 @@ PUNCTUATION.hasKey('de'); // false
 
 ---
 
+## Aliases
+
+The `@yalla/typography-rules` export provides an `ALIAS` utility for mapping various locale identifiers to a single root key. All keys and values are automatically normalized to lowercase, and lookups are case-insensitive.
+
+### `createAlias(map)`
+
+Creates a normalized alias map with utility methods.
+
+```typescript
+import { createAlias } from '@yalla/typography-rules';
+
+const ALIAS = createAlias({
+  en: ['en-US', 'English'],
+  ru: ['ru-RU', 'Russian'],
+});
+```
+
+| Method | Description |
+| :--- | :--- |
+| `has(alias)` | Checks if an alias exists as a root key or an alternative name. |
+| `resolve(alias)` | Resolves an alias to its root key. |
+| `push(root, ...aliases)` | Adds new alternative names to an existing or new root key. |
+| `normalize(...alias)` | Helper to lowercase one or more strings. |
+
+### Global `ALIAS`
+
+A pre-configured instance used internally for supported locales:
+
+```typescript
+import { ALIAS } from '@yalla/typography-rules';
+
+ALIAS.ru;               // ['ru-ru', 'russian', 'русский']
+ALIAS.resolve('Russian'); // 'ru'
+ALIAS.has('Old English'); // true
+```
+
+---
+
 ## Helpers
 
 The `@yalla/typography-rules/helpers` export provides utilities for safe text
@@ -582,6 +616,7 @@ const result = unprotect(processed, captured);
 - Version strings (`v1.2.3`, etc.)
 - CSS selectors, CLI flags (`--option`)
 - ISBN, ISSN, DOI, ORCID identifiers
+- `[##(...)##]` — Special protected block for protect any text inside `()`.
 
 ### Pattern registry
 
@@ -859,7 +894,6 @@ import type {
   RegExpReplaceRule,
   RegExpTransformRule,
   FunctionRule,
-  NodeFunctionRule,
   RuleFunction,
   Node,
   TextNode,
