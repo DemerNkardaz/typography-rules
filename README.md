@@ -5,7 +5,7 @@ typographically correct output. Ships with a glyph registry, smart text
 functions, and a composable rule pipeline.
 
 Used as a rules provider for typography plugins such as
-[@yalla/typography-core](https://github.com/DemerNkardaz/typography-core) / 
+[@yalla/typography-core](https://github.com/DemerNkardaz/typography-core) /
 [@yalla/remark-typography](https://github.com/DemerNkardaz/remark-typography).
 
 ---
@@ -117,6 +117,10 @@ newRule('/my/rule/label', myFunction, ['arg1', 'arg2']);
 | `second`  | `string \| transform fn \| args[]` | Replacement, transformer, or arguments                                                                                   |
 | `weight`  | `number`                           | Execution priority — lower values run first (default: `0`)                                                               |
 
+> **Note:** `NodeFunctionRule` (`kind: 'node'`) is defined in types but is not
+> yet creatable via `newRule`. Node-returning functions are registered as
+> `FunctionRule` and resolved at pipeline level by the consuming plugin.
+
 ---
 
 ### `registerRule(locale, rules[])`
@@ -125,9 +129,34 @@ Registers one or more rules for a locale. Automatically invalidates the weighted
 rule cache for that locale and `'common'`.
 
 ```typescript
-registerRule('common', newRule(/\s+/g, ' '));
-registerRule('de', newRule(/--/g, '—'), newRule(/"/g, '„'));
+registerRule('common', newRule('/common/space/cleanup', /\s+/g, ' '));
+registerRule('de', newRule('/deutsch/em-dash', /--/g, '—'), newRule(/"/g, '„'));
 ```
+
+---
+
+### `rulesBase(locale, base, label?, excludes?, ...rules)`
+
+Registers rules for a locale, inheriting from an existing base locale. Useful
+for defining locale variants that share most rules with a parent.
+
+```typescript
+rulesBase(
+  'fr-CA', // target locale
+  'fr', // inherit from French
+  { expression: /^\/french\//, replacement: '/french-ca/' }, // rename labels
+  ['/french/quotes/guillemets'], // exclude specific rules
+  newRule('/french-ca/extra', /…/g, '...') // add custom rules on top
+);
+```
+
+| Parameter  | Type              | Description                                              |
+| ---------- | ----------------- | -------------------------------------------------------- |
+| `locale`   | `string`          | Target locale to register rules for                      |
+| `base`     | `string`          | Source locale to inherit rules from                      |
+| `label`    | `LabelTransform?` | Optional `{ expression, replacement }` to rewrite labels |
+| `excludes` | `string[]?`       | Rule labels from the base to skip                        |
+| `...rules` | `Rule[]`          | Additional rules appended after the inherited ones       |
 
 ---
 
@@ -139,6 +168,18 @@ Populates the global rule registry with the built-in default ruleset.
 initTypographyRules(); // All locales
 initTypographyRules('en'); // English rules only
 initTypographyRules('ru'); // Russian rules only
+```
+
+---
+
+### `initMarkupRules(from?)`
+
+Populates the global rule registry with built-in markup rules (superscript,
+subscript, chemical notation, ruby text).
+
+```typescript
+initMarkupRules(); // All markup rule groups
+initMarkupRules('common'); // Common markup rules only
 ```
 
 ---
@@ -253,7 +294,8 @@ Built-in rule labels follow a consistent hierarchy:
 | `english`      | `/english/ligatures/…`                    | English-only rules     |
 | `russian`      | `/russian/typography/…`                   | Russian-only rules     |
 | Second segment | `/common/space/…`, `/common/typography/…` | Rule category          |
-| Third segment  | `/common/math/negative-number`            | Specific rule          |
+| Third segment  | `/common/math/negative-number`            | Specific case          |
+| Fourth segment | `/common/punctuation/dashes/em-dash`      | Specific rule          |
 
 ---
 
@@ -288,26 +330,25 @@ smartQuotes('"He said \'hi\'"'); // “He said ‘hi’”
 
 ### `smartNumberGrouping(text, settings?)`
 
-Inserts non-breaking spaces (or another character, e.g. `,`) as thousands
-separators into large numeric sequences.
+Inserts symbols (e.g. `,`) as thousands separators into large numeric sequences
+based on locale (uses `Intl.NumberFormat`).
 
 ```typescript
 import { smartNumberGrouping } from '@yalla/typography-rules/functions';
 
 smartNumberGrouping('Price: 1234567');
-// “Price: 1 234 567”
+// “Price: 1,234,567”
 
-smartNumberGrouping('Value: 1234567.891011', { separateFloat: true });
-// “Value: 1 234 567.891 011”
+smartNumberGrouping('Value: 1234567.891011', { locale: 'ru-RU' });
+// “Value: 1 234 567,891011”
 ```
 
 **Settings:**
 
-| Option          | Type               | Default                     | Description                                            |
-| --------------- | ------------------ | --------------------------- | ------------------------------------------------------ |
-| `minLength`     | `number`           | `5`                         | Minimum digit count before spacing is applied          |
-| `separateFloat` | `boolean`          | `false`                     | Whether to group digits in the fractional part as well |
-| `separator`     | `Spaces \| string` | `SPACES.noBreak` (`\u00A0`) | Character inserted as a thousands separator            |
+| Option      | Type     | Default   | Description                                            |
+| ----------- | -------- | --------- | ------------------------------------------------------ |
+| `locale`    | `string` | `'en-US'` | BCP 47 locale tag used by `Intl.NumberFormat`          |
+| `minLength` | `number` | `5`       | Minimum integer digit count before grouping is applied |
 
 ---
 
@@ -334,14 +375,16 @@ clearSpaces('a  b  c'); // 'a b c'
 
 Prevents typographic runts — single short words isolated at the end of a
 paragraph — by replacing the preceding space with a non-breaking space. For
-longer last words, also protects the penultimate word.
+longer last words, also protects the penultimate word with
+`white-space: nowrap`.
 
 **Settings:**
 
-| Option      | Type               | Default          | Description                                                          |
-| ----------- | ------------------ | ---------------- | -------------------------------------------------------------------- |
-| `threshold` | `number`           | `10`             | Maximum character length of the last word to trigger runt protection |
-| `space`     | `Spaces \| string` | `SPACES.noBreak` | Replacement space character                                          |
+| Option          | Type               | Default          | Description                                                          |
+| --------------- | ------------------ | ---------------- | -------------------------------------------------------------------- |
+| `threshold`     | `number`           | `10`             | Maximum character length of the last word to trigger runt protection |
+| `space`         | `Spaces \| string` | `SPACES.noBreak` | Replacement space character                                          |
+| `minLineLength` | `number`           | `150`            | Minimum text length required to apply runt protection at all         |
 
 ---
 
@@ -522,8 +565,9 @@ afterward.
 ```typescript
 import { protect, unprotect } from '@yalla/typography-rules/helpers';
 
-const [protected, captured] = protect(text);
-// ... apply typography rules to `protected` ...
+const [protectedText, captured] = protect(text);
+// ... apply typography rules to `protectedText` ...
+const processed = applyRules(protectedText); // your pipeline here
 const result = unprotect(processed, captured);
 ```
 
@@ -577,50 +621,194 @@ splitNodes(processed, nodes); // writes segments back to nodes
 
 ### Common (applied to all locales)
 
-| Label                                       | Pattern / Trigger                                                    | Replacement                | Description                                                                            |
-| ------------------------------------------- | -------------------------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------- |
-| `/common/space/cleanup/default`             | Multiple identical spaces (`\u00A0{2,}`, `\u200A{2,}`, `\u2009{2,}`) | Single space               | Collapses duplicate non-breaking, hair, and thin spaces via `clearSpaces`              |
-| `/common/space/cleanup/trim`                | Leading / trailing whitespace (`^\s` or `\s$`)                       | _(removed)_                | Trims surrounding whitespace from the processed text                                   |
-| `/common/math/negative-number`              | Hyphen-minus before digit (`-123`)                                   | `−123`                     | Replaces ASCII hyphen-minus with Unicode minus sign `−` (`\u2212`) in negative numbers |
-| `/common/math/number-range/default`         | Digit range with hyphen (`1-2`)                                      | `1–2`                      | Converts hyphen between two integer sequences into an en dash                          |
-| `/common/math/number-range/ellipsis`        | Number range with en dash or minus (`−2–3`)                          | `−2…3`                     | Converts numeric ranges using en dash or minus into ellipsis notation                  |
-| `/common/typography/dashes`                 | Double hyphen (`--`)                                                 | `—`                        | Replaces double hyphen-minus with a typographic em dash                                |
-| `/common/typography/dots/dots-overload`     | Four or more consecutive dots (`....`)                               | `...`                      | Normalizes over-long dot sequences before ellipsis conversion                          |
-| `/common/typography/dots/ellipsis`          | Three dots (`...`)                                                   | `…`                        | Converts ASCII triple-dot into the Unicode ellipsis character `…` (`\u2026`)           |
-| `/common/typography/dots/ellipsis-overload` | Two or more consecutive ellipses (`……`)                              | `…`                        | Deduplicates repeated ellipsis characters                                              |
-| `/common/typography/apostrophe`             | Straight apostrophe (`'`)                                            | `’`                        | Replaces with Unicode right single quotation mark `'` (`\u2019`), weight `200`         |
-| `/common/typography/runt`                   | Short last word(s) in a paragraph                                    | Preceding space → `\u00A0` | Prevents typographic runts. Weight: `Infinity` — always runs last                      |
+#### Expressions
+
+Shared named expression patterns used across common rules
+(`typography/expressions/common.ts`):
+
+| Name                             | Pattern description                                                       |
+| -------------------------------- | ------------------------------------------------------------------------- |
+| `plusMinus`                      | `+` followed by `-` or `−`                                                |
+| `minusPlus`                      | `-` or `−` followed by `+`                                                |
+| `sectionNumeral`                 | Section sign `§` followed by numeral(s)                                   |
+| `percentValue`                   | Number followed by `%`, `‰`, or `‱`                                       |
+| `numeralsRange`                  | Two digit sequences separated by `-` (e.g. `1-2`)                         |
+| `ellipsisRange`                  | Number, then `–` or `−`, then number (e.g. `−2–3`)                        |
+| `multipleEllipsis`               | Two or more consecutive `…`                                               |
+| `walletSymbolBeforeValue`        | Currency symbol followed by digits (e.g. `$100`)                          |
+| `walletSymbolAfterValue`         | Digits followed by currency symbol (e.g. `100$`)                          |
+| `walletISOBeforeValue`           | ISO currency code followed by digits (e.g. `USD 100`)                     |
+| `walletISOAfterValue`            | Digits followed by ISO currency code (e.g. `100 USD`)                     |
+| `expressiveAposiopesis`          | Expressive punctuation (`!`, `?`, `‽`, etc.) followed by dots or ellipsis |
+| `backwardsExpressiveAposiopesis` | Dots or ellipsis followed by expressive punctuation                       |
+| `temperature`                    | Digit followed by a temperature unit symbol (℃, ℉, K, etc.)               |
+
+#### Rules
+
+| Label                                        | Pattern / Trigger                    | Replacement           | Description                                                                 |
+| -------------------------------------------- | ------------------------------------ | --------------------- | --------------------------------------------------------------------------- |
+| `/common/space/cleanup/multiple`             | Multiple identical special spaces    | Single space          | Collapses duplicate non-breaking, hair, and thin spaces via `clearSpaces`   |
+| `/common/space/cleanup/trim`                 | Leading / trailing whitespace        | _(removed)_           | Trims surrounding whitespace from the processed text                        |
+| `/common/number/negative`                    | Hyphen-minus before digit (`-123`)   | `−123`                | Replaces ASCII hyphen-minus with Unicode minus sign `−`                     |
+| `/common/number/range/en-dash`               | Digit range with hyphen (`1-2`)      | `1–2`                 | Converts hyphen between two digit sequences into an en dash                 |
+| `/common/number/range/ellipsis-on-negative`  | Range with en dash or minus          | `−2…3`                | Converts numeric ranges using en dash or minus into ellipsis notation       |
+| `/common/number/dimension`                   | `NxN` or `NхN` (latin/cyrillic x)    | `N×N`                 | Replaces dimension separator with multiplication sign ×                     |
+| `/common/number/multiply`                    | `N*N`                                | `N×N`                 | Replaces asterisk between numbers with multiplication sign ×                |
+| `/common/number/fraction`                    | `N/N`                                | `N⁄N` 16⁄9 1000⁄7     | Replaces slash with fraction slash `⁄`                                      |
+| `/common/symbol/copyright`                   | `(c)` or `(с)` (latin/cyrillic)      | `©`                   | Copyright symbol substitution                                               |
+| `/common/symbol/trademark`                   | `(tm)` or `(тм)`                     | `™`                   | Trademark symbol substitution                                               |
+| `/common/symbol/registered`                  | `(r)`                                | `®`                   | Registered trademark symbol substitution                                    |
+| `/common/symbol/section`                     | `(s)`                                | `§`                   | Section sign substitution                                                   |
+| `/common/symbol/math/plus-minus`             | `+-` or `+−`                         | `±`                   | Plus-minus sign substitution                                                |
+| `/common/symbol/math/minus-plus`             | `-+` or `−+`                         | `∓`                   | Minus-plus sign substitution                                                |
+| `/common/punctuation/dashes/em-dash`         | Double hyphen `--`                   | `—`                   | Replaces double hyphen-minus with a typographic em dash                     |
+| `/common/punctuation/dots/overload`          | Four or more consecutive dots `....` | `...`                 | Normalizes over-long dot sequences before ellipsis conversion               |
+| `/common/punctuation/dots/ellipsis`          | Three dots `...`                     | `…`                   | Converts ASCII triple-dot into the Unicode ellipsis character `…`           |
+| `/common/punctuation/dots/ellipsis-overload` | Two or more consecutive `…`          | `…`                   | Deduplicates repeated ellipsis characters                                   |
+| `/common/punctuation/apostrophe`             | Straight apostrophe `'`              | `’`                   | Replaces with Unicode right single quotation mark `’`, weight `200`         |
+| `/common/symbol/section/value`               | `§` followed by numeral(s)           | `§ <numeral>`         | Adds narrow non-breaking space between section sign and numeral, weight `1` |
+| `/common/typography/runt`                    | Short last word(s) in a paragraph    | Preceding space → ` ` | Prevents typographic runts. Weight: `Infinity` — always runs last           |
 
 #### Markup Rules
 
 | Label                       | Pattern / Trigger                     | Replacement        | Description                                                               |
 | --------------------------- | ------------------------------------- | ------------------ | ------------------------------------------------------------------------- |
-| `/common/wraps/sup`         | `[^…]` marker syntax                  | `<sup>` node       | Wraps bracket-marker content in a superscript element via `wrapWithTag`   |
-| `/common/wraps/sub`         | `[_…]` marker syntax                  | `<sub>` node       | Wraps bracket-marker content in a subscript element via `wrapWithTag`     |
 | `/common/wraps/chem`        | `[%…]` marker syntax                  | `<math>` node tree | Parses chemical notation into MathML `<mmultiscripts>` via `chemNotation` |
-| `/common/wraps/ruby` (`:`)  | `[:base\|…][:annotation\|…]` syntax   | `<ruby>` node tree | Ruby annotation above the base (`--over`), via `rubyText`                 |
 | `/common/wraps/ruby` (`?:`) | `[?:base\|…][?:annotation\|…]` syntax | `<ruby>` node tree | Alternate ruby style (`--alternate`), via `rubyText`                      |
 | `/common/wraps/ruby` (`!:`) | `[!:base\|…][!:annotation\|…]` syntax | `<ruby>` node tree | Ruby annotation below the base (`--under`), via `rubyText`                |
+| `/common/wraps/ruby` (`:`)  | `[:base\|…][:annotation\|…]` syntax   | `<ruby>` node tree | Ruby annotation above the base (`--over`), via `rubyText`                 |
+| `/common/wraps/sup`         | `[^…]` marker syntax                  | `<sup>` node       | Wraps bracket-marker content in a superscript element via `wrapWithTag`   |
+| `/common/wraps/sub`         | `[_…]` marker syntax                  | `<sub>` node       | Wraps bracket-marker content in a subscript element via `wrapWithTag`     |
+
+> **Note on markup rule order:** rules are registered with weight `Infinity` and
+> applied in the order shown — `chem` first, ruby variants from least-specific
+> to most-specific marker (to avoid conflicts), then `sup`/`sub` last.
 
 ---
 
 ### Russian (`ru`)
 
-_Rules coming soon._
+#### Expressions
 
-| Pattern / Trigger | Replacement | Description |
-| ----------------- | ----------- | ----------- |
-| —                 | —           | —           |
+Russian-specific named expression patterns (`typography/expressions/ru.ts`),
+extending common expressions:
+
+| Name                        | Pattern description                                                           |
+| --------------------------- | ----------------------------------------------------------------------------- |
+| `numeroNumeral`             | Numero sign `№` followed by numeral(s)                                        |
+| `invalidPunctuationSpacing` | Space after left punctuation or before right punctuation (locale-aware)       |
+| `dialogEmDash`              | Em dash `—` at the start of a line (dialogue opener)                          |
+| `attributionEmDash`         | Left punctuation, then `—`, then a word (attribution pattern)                 |
+| `subjectPredicateEmDash`    | Word `—` word (subject–predicate dash pattern)                                |
+| `siUnitMul`, `siUnitDiv`    | SI unit multiplication / division expressions (Cyrillic prefixes)             |
+| `siUnitBase`                | Digit followed by a Russian SI unit                                           |
+| `siUnitPowAfterNum`         | Digit, SI unit, then exponent digit                                           |
+| `siUnitPow`                 | SI unit followed by exponent digit (not preceded by digit)                    |
+| `date`                      | Numeral followed by a Russian date abbreviation (в, г, мес, нед, дн, д, etc.) |
+
+#### Rules
+
+| Label                                                   | Pattern / Trigger                                     | Replacement                                | Description                                                                                                             |
+| ------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `/russian/currency/wallet/symbol-flip`                  | Currency symbol before value (`$100`)                 | `100$`                                     | Moves currency symbol after the value (Russian convention)                                                              |
+| `/russian/currency/wallet/iso-flip`                     | ISO code before value (`USD 100`)                     | `100 USD`                                  | Moves ISO code after the value                                                                                          |
+| `/russian/currency/wallet/symbol-value`                 | Value then currency symbol (`100$`)                   | `100 $`                                    | Adds non-breaking space between value and currency symbol                                                               |
+| `/russian/currency/wallet/iso-value`                    | Value then ISO code (`100 USD`)                       | `100 USD`                                  | Adds non-breaking space between value and ISO code                                                                      |
+| `/russian/currency/rub-to-symbol`                       | `рублей`, `руб.`, `р.` after digits                   | `N ₽`                                      | Replaces Russian rouble word forms with `₽` symbol                                                                      |
+| `/russian/currency/eur-to-symbol`                       | `евро` after digits                                   | `N €`                                      | Replaces euro word with `€` symbol                                                                                      |
+| `/russian/currency/usd-to-symbol`                       | `долларов`, `дол.` after digits                       | `N $`                                      | Replaces dollar word forms with `$` symbol                                                                              |
+| `/russian/number/groups`                                | Large numbers (5+ digits)                             | `1 234 567`                                | Digit grouping via `smartNumberGrouping` with `locale: 'ru-RU'`                                                         |
+| `/russian/number/normalize/dot->comma`                  | `N.N` decimal dot                                     | `N,N`                                      | Converts decimal dot to comma (Russian numeric standard)                                                                |
+| `/russian/metric/si-unit/base`                          | Digit followed by SI unit                             | `N Unit`                                   | Narrow non-breaking space between value and unit                                                                        |
+| `/russian/metric/si-unit/n*n-n`                         | SI unit multiplication (`м*с`)                        | `м·с` `Н·м/с`                              | Replaces `*` between SI units with middle dot `·`                                                                       |
+| `/russian/metric/si-unit/n-n*n`                         | SI unit division                                      | `м·с` `Дж/Кл·с`                            | Same as above for division form                                                                                         |
+| `/russian/metric/si-unit/pow-after-value`               | `N Unit<exp>`                                         | `N Unit<sup>exp</sup>`                     | Superscript exponent with narrow non-breaking space, weight `-1`                                                        |
+| `/russian/metric/si-unit/pow`                           | `Unit<exp>` (no preceding number)                     | `Unit<sup>exp</sup>`<br/>`м³/(кг·с²)`      | Superscript exponent, weight `-1`                                                                                       |
+| `/russian/scientific/temperature/value`                 | `N ℃` / `N ℉` etc.                                    | `N ℃`                                      | Non-breaking space between temperature value and unit<br/>`°C` `°F` `K` `°D` `°L` `°N` `°W` `°Da` `°H` `°R` `°Ré` `°Rø` |
+| `/russian/symbol/percent-like/value`                    | `N%` / `N‰` / `N‱`                                    | `N<NBSP>%`                                 | Non-breaking space between value and percent-like symbol                                                                |
+| `/russian/symbol/numero/value`                          | `№` followed by numeral(s)                            | `№ <numeral>`                              | Narrow non-breaking space between numero sign and numeral                                                               |
+| `/russian/number/division`                              | `N/N`                                                 | `N÷N`                                      | Replaces slash between numbers with obelus `÷`                                                                          |
+| `/russian/number/division-times`                        | `N/*N`                                                | `N⋇N`                                      | Division-times operator substitution                                                                                    |
+| `/russian/punctuation/dashes/dialog-em-dash`            | `—` at line start                                     | `—<NBSP>`                                  | Non-breaking space after dialogue em dash                                                                               |
+| `/russian/punctuation/dashes/attribution-em-dash`       | Right punctuation, `<SP>—<SP>`, word                  | Right punctuation, `<NBSP>—<NBSP>`, word   | Non-breaking spaces around attribution dash                                                                             |
+| `/russian/punctuation/dashes/subject-predicate-em-dash` | word, `<SP>—<SP>`, word                               | word, `<NBSP>—<SP>`, word                  | Non-breaking spaces around subject–predicate dash                                                                       |
+| `/russian/punctuation/quotes`                           | Straight quotes `"…"`                                 | `«…»` / `„…“`                              | Russian typographic quotes via `smartQuotes`, weight `100`                                                              |
+| `/russian/punctuation/dot-after-quote`                  | `.»`                                                  | `».`                                       | Moves period outside closing guillemet, weight `1000`                                                                   |
+| `/russian/punctuation/dot-after-expression`             | Expressive punctuation near dots<br/>`!...` `!…` etc. | Normalized form<br/>`!..` `?..` `‽..`      | Normalizes aposiopesis punctuation patterns                                                                             |
+| `/russian/punctuation/invalid-spacing`                  | Space after `«` or before `»`                         | _(removed)_                                | Removes invalid spaces around guillemets, weight `1000`                                                                 |
+| `/russian/compositions/initials`                        | Б. Ю. Александров etc.                                | Б. Ю. Александров<br/>Thin-space separated | Replaces regular spaces between initials and name with thin spaces ` `                                                  |
+| `/russian/text/conjunctions`                            | Short particles: `бы`, `же`, `ли` etc.                | `<NBSP>particle`                           | Prevents particles from being orphaned at line start                                                                    |
+| `/russian/text/conjunctions`                            | Prepositions: `за`, `из`, `на`, `не` etc.             | `preposition<NBSP>`                        | Prevents prepositions from being left alone at line end                                                                 |
+| `/russian/text/adress`                                  | `мкр-н`, `дом`, `д.`, `ул.` etc.                      | With `<NBSP>`                              | Prevents address abbreviations from splitting across lines                                                              |
+| `/russian/text/common-shorts`                           | `коп.`, `см.`, `рис.` etc.                            | With `<NBSP>`                              | Prevents common abbreviations from splitting                                                                            |
+| `/russian/text/organizations`                           | `АО`, `ООО`, `ПАО`, `НИИ` etc.                        | `ООО<NBSP>`                                | Non-breaking space after legal entity abbreviations                                                                     |
+| `/russian/text/dates`                                   | `N в.` / `N г.` / `N мес.` etc.                       | `N<NBSP>в.`                                | Non-breaking space between numeral and date abbreviation                                                                |
+| `/russian/text/millions`                                | `N тыс.` / `N млн.` / `N млрд.`                       | `N<NBSP>тыс.`                              | Non-breaking space before large-number abbreviations                                                                    |
+| `/russian/text/no-break-hyphen`                         | `кто-то`, `кое-что`, `ну-ка`, `всё-таки` etc.         | With non-breaking hyphen                   | Replaces hyphens in fixed compound words/particles with non-breaking hyphen                                             |
+| `/russian/text/orphan-letters`                          | Single Cyrillic letter followed by space              | `letter<NBSP>`                             | Prevents single-letter words from being orphaned at line end                                                            |
+
+#### Markup **Rules**
+
+_No locale-specific markup rules for `ru` currently._
 
 ---
 
 ### English (`en`)
 
-_Rules coming soon._
+#### Expressions
 
-| Pattern / Trigger | Replacement | Description |
-| ----------------- | ----------- | ----------- |
-| —                 | —           | —           |
+English-specific named expression patterns (`typography/expressions/en.ts`),
+extending common expressions:
+
+| Name                        | Pattern description                                                  |
+| --------------------------- | -------------------------------------------------------------------- |
+| `numberNumeral`             | Number sign `#` followed by digits (e.g. `#42`)                      |
+| `invalidPunctuationSpacing` | Space after left punctuation or before right punctuation (en-locale) |
+| `siUnitMul`, `siUnitDiv`    | SI unit multiplication / division expressions                        |
+| `siUnitBase`                | Digit followed by an SI unit                                         |
+| `siUnitPowAfterNum`         | Digit, SI unit, then exponent digit                                  |
+| `siUnitPow`                 | SI unit followed by exponent digit (not preceded by digit)           |
+
+#### Rules
+
+| Label                                        | Pattern / Trigger                     | Replacement            | Description                                                      |
+| -------------------------------------------- | ------------------------------------- | ---------------------- | ---------------------------------------------------------------- |
+| `/english/currency/wallet/symbol-flip`       | Value then currency symbol (`100$`)   | `$100`                 | Moves currency symbol before the value (English convention)      |
+| `/english/currency/wallet/iso-flip`          | ISO code before value (`USD 100`)     | `100 USD`              | Moves ISO code after the value                                   |
+| `/english/currency/wallet/symbol-value`      | Currency symbol before value (`$100`) | `$100`                 | Ensures no extra space between symbol and value                  |
+| `/english/currency/wallet/iso-value`         | Value then ISO code (`100 USD`)       | `100 USD`              | Adds non-breaking space between value and ISO code               |
+| `/english/number/groups`                     | Large numbers (5+ digits)             | `1,234,567`            | Digit grouping via `smartNumberGrouping` with `locale: 'en-US'`  |
+| `/english/metric/si-unit/base`               | Digit followed by SI unit             | `N Unit`               | Narrow non-breaking space between value and unit                 |
+| `/english/metric/si-unit/n*n-n`              | SI unit multiplication (`m*s`)        | `m·s` `N·m/s`          | Replaces `*` between SI units with middle dot `·`                |
+| `/english/metric/si-unit/n-n*n`              | SI unit division                      | `m·s` `J/C·s`          | Same as above for division form                                  |
+| `/english/metric/si-unit/pow-after-value`    | `N Unit<exp>`                         | `N Unit<sup>exp</sup>` | Superscript exponent with narrow non-breaking space, weight `-1` |
+| `/english/metric/si-unit/pow`                | `Unit<exp>` (no preceding number)     | `Unit<sup>exp</sup>`   | Superscript exponent, weight `-1`                                |
+| `/english/scientific/temperature/value`      | `N ℃` / `N ℉` etc.                    | `N℃`                   | Removes space between temperature value and unit                 |
+| `/english/symbol/percent-like/value`         | `N%` / `N‰` / `N‱`                    | `N%`                   | Normalizes space between value and percent-like symbol           |
+| `/english/symbol/hash/value`                 | `#` followed by digits (`#42`)        | `#42`                  | Normalizes space between number sign and numeral                 |
+| `/english/number/division`                   | `N/N`                                 | `N÷N`                  | Replaces slash between numbers with obelus `÷`                   |
+| `/english/number/division-times`             | `N/*N`                                | Division-times form    | Division-times operator substitution                             |
+| `/english/punctuation/quotes`                | Straight quotes `"…"` / `'…'`         | `“…”` / `‘…’`          | US typographic quotes via `smartQuotes`, weight `100`            |
+| `/english/punctuation/dot-before-expression` | Expressive punctuation near dots      | Normalized form        | Normalizes aposiopesis punctuation patterns                      |
+| `/english/punctuation/invalid-spacing`       | Space after `“` or before `”` etc.    | _(removed)_            | Removes invalid spaces around punctuation, weight `1000`         |
+| `/english/ligatures/fi`                      | `fi`                                  | `ﬁ`                    | Typographic fi ligature                                          |
+| `/english/ligatures/fl`                      | `fl`                                  | `ﬂ`                    | Typographic fl ligature                                          |
+| `/english/ligatures/ffi`                     | `ffi`                                 | `ﬃ`                    | Typographic ffi ligature                                         |
+| `/english/ligatures/ffl`                     | `ffl`                                 | `ﬄ`                    | Typographic ffl ligature                                         |
+
+#### Markup Rules
+
+_No locale-specific markup rules for `en` currently._
+
+---
+
+### Old English / Ænglisċ (`ang`)
+
+#### Rules
+
+| Label                  | Pattern / Trigger           | Replacement | Description                                                            |
+| ---------------------- | --------------------------- | ----------- | ---------------------------------------------------------------------- |
+| `/ænglisċ/articles/þe` | `The` / `the` / `Þe` / `þe` | `Þͤ` / `þͤ`   | Replaces modern “the” with Old English thorn + combining letter e (`ͤ`) |
 
 ---
 
@@ -631,6 +819,7 @@ their registration order (stable sort).
 
 | Weight        | Meaning                                                             |
 | ------------- | ------------------------------------------------------------------- |
+| `-Infinity`   | Always first, which must run before all text transforms             |
 | `0` (default) | Standard priority                                                   |
 | `< 0`         | Applied before standard rules                                       |
 | `> 0`         | Applied after standard rules                                        |

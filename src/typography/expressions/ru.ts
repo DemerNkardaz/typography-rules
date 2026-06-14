@@ -45,12 +45,12 @@ const EXPRESSIONS = {
 	),
 	dialogEmDash: new RegExp(`(^${DASHES.em})\\s*`, 'gm'),
 	attributionEmDash: new RegExp(
-		`(${PARTS.leftPunctuation})\\s*(${DASHES.em})\\s*([а-яА-ЯёЁa-zA-Z]+)`,
-		'g'
+		`([${PARTS.rightPunctuation}])\\s*(${DASHES.em})\\s*([а-яА-ЯёЁa-zA-Z]+)`,
+		'gi'
 	),
 	subjectPredicateEmDash: new RegExp(
 		`([а-яА-ЯёЁa-zA-Z]+)\\s+(${DASHES.em})\\s+([а-яА-ЯёЁa-zA-Z]+)`,
-		'g'
+		'gi'
 	),
 	siUnitMul: new RegExp(`(${SI_OPERAND})\\*(${SI_OPERAND}(?:\\/${SI_OPERAND})*)`, 'g'),
 	siUnitDiv: new RegExp(`(${SI_OPERAND}(?:\\/${SI_OPERAND})*)\\*(${SI_OPERAND})`, 'g'),

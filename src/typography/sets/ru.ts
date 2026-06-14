@@ -110,7 +110,7 @@ export default [
 	newRule(
 		'/russian/punctuation/dashes/subject-predicate-em-dash',
 		EXPRESSIONS.subjectPredicateEmDash,
-		`$1${SPACES.noBreak}$2${SPACES.noBreak}$3`
+		`$1${SPACES.noBreak}$2${SPACES._}$3`
 	),
 	newRule(
 		'/russian/punctuation/quotes',

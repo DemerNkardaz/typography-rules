@@ -301,7 +301,7 @@ export const MATHS = createCharacters({
 export const TEMPERATURES = createCharacters({
 	celsiusSolid: '\u2103', // ℃
 	fahrenheitSolid: '\u2109', // ℉
-	kelvin: '\u212A', // K
+	kelvin: '[K\u212A]', // K
 	celsius: '°C',
 	fahrenheit: '°F',
 	delisle: '°D',
