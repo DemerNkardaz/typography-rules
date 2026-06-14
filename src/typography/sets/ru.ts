@@ -167,13 +167,13 @@ export default [
 	newRule('/russian/text/adress', /(?<=\d+[-]?(?:й|го|му))\s*([-−]?этаж)/gi, `${SPACES.noBreak}$1`),
 	newRule(
 		'/russian/text/adress',
-		/(?<=\s)(обл|кр|ст|пос|с|д|ул|пер|пр|пр-т|просп|пл|бул|б-р|наб|ш|туп|оф|комн?|уч|вл|влад|стр|корп?)(\.|\s)([а-яА-ЯёЁa-zA-Z\d]+)/gi,
-		`$1.${SPACES.noBreak}$2`
+		/(?<=\s)(обл|кр|ст|посд|ул|пер|пр|пр-т|просп|пл|бул|б-р|наб|ш|туп|оф|комн?|уч|вл|влад|стр|корп?)(\.|\s)([а-яА-ЯёЁa-zA-Z\d]+)/gi,
+		`$1.${SPACES.noBreak}$3`
 	),
 	newRule(
 		'/russian/text/common-shorts',
-		/(?<=\s)(коп|см|им|рис|илл?|гл|кн|стр|ст|с|п)(\.|\s)/gi,
-		`$1.${SPACES.noBreak}.`
+		/(?<=\s)(см|им|рис|илл?|гл|кн|стр|стп)(\.|\s|\.\s)/gi,
+		`$1.${SPACES.noBreak}`
 	),
 	newRule(
 		'/russian/text/organizations',
@@ -181,11 +181,7 @@ export default [
 		`$1${SPACES.noBreak}`
 	),
 	newRule('/russian/text/dates', EXPRESSIONS.date, `$1${SPACES.noBreak}$2.`),
-	newRule(
-		'/russian/text/millions',
-		/(\d+)\s*(тыс|млн|млрд|трлн)(\.|\s)/gi,
-		`$1${SPACES.noBreak}$2.`
-	),
+	newRule('/russian/text/millions', /(\d+)\s*(тыс|млн|млрд|трлн)\./gi, `$1${SPACES.noBreak}$2.`),
 	newRule(
 		'/russian/text/no-break-hyphen',
 		/(^|[^а-яА-ЯёЁ])(кто|что|какой|который|чей|сколько|где|куда|откуда|когда|как|зачем|почему|отчего|так|этак|тогда|из)-(то|либо|нибудь|за)/gi,

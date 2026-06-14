@@ -57,7 +57,7 @@ const EXPRESSIONS = {
 	siUnitBase: new RegExp(`(\\d+)\\s*(${SI_UNIT})(?![/*])`, 'g'),
 	siUnitPowAfterNum: new RegExp(`(\\d+)\\s*(${SI_UNIT})(\\d+)`, 'g'),
 	siUnitPow: new RegExp(`(?<!\\d\\s*)(${SI_UNIT})(\\d+)`, 'g'),
-	date: new RegExp(`(${PARTS.numerals})\\s(вв|в|гг|г|мес|нед|дн|д)(\\.|\\s)`, 'gi'),
+	date: new RegExp(`(${PARTS.numerals})\\s(вв|в|гг|г|мес|нед|дн|д)\\.`, 'gi'),
 } as const;
 
 export default EXPRESSIONS;
