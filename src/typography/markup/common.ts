@@ -1,5 +1,5 @@
 import { newRule } from '@/api';
-import { chemNotation, rubyText, wrapWithTag } from '@/functions';
+import { chemNotation, rubyText, wrapWithTag } from '@nkardaz/typography-rules/functions';
 
 /**
  * Shared markup rules applied across all locales.

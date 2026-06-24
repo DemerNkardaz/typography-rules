@@ -1,4 +1,4 @@
-import { PUNCTUATION } from '@/glyphs';
+import { PUNCTUATION } from '@nkardaz/typography-rules/glyphs';
 import type { QuoteSettings } from '@/types';
 
 /**

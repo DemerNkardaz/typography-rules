@@ -1,6 +1,13 @@
 import { newRule } from '@/api';
-import { smartNumberGrouping, smartQuotes, wrapWithTag } from '@/functions';
-import { PUNCTUATION, LIGATURES, SPACES, NONE, CHARACTERS, MATHS } from '@/glyphs';
+import { smartNumberGrouping, smartQuotes, wrapWithTag } from '@nkardaz/typography-rules/functions';
+import {
+	PUNCTUATION,
+	LIGATURES,
+	SPACES,
+	NONE,
+	CHARACTERS,
+	MATHS,
+} from '@nkardaz/typography-rules/glyphs';
 
 import EXPRESSIONS from '../expressions/en';
 

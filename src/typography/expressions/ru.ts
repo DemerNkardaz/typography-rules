@@ -1,4 +1,4 @@
-import { CHARACTERS, DASHES, PUNCTUATION } from '@/glyphs';
+import { CHARACTERS, DASHES, PUNCTUATION } from '@nkardaz/typography-rules/glyphs';
 import { PARTS as COMMON_PARTS, EXPRESSIONS as COMMON_EXPRESSIONS } from './common';
 
 const SI_PREFIX = 'Й|З|Э|П|Т|Г|М|к|г|М|к|д|с|м|мк|н|п|ф|а|з|й';

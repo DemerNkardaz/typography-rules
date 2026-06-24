@@ -1,6 +1,6 @@
 {
   "name": "@nkardaz/typography-rules",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Rules package to be used in typography plugins. Glyphs library and helpers included.",
   "license": "MIT",
   "author": "Yalla Nkardaz",
@@ -70,6 +70,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@nkardaz/remark-typography": "file:../remark-typography",
+    "@nkardaz/typography-core": "file:../typography-core",
+    "@nkardaz/typography-rules": "^1.0.3",
     "@types/mdast": "^4.0.4",
     "@types/node": "^25.9.2",
     "@vitest/coverage-v8": "^4.1.8",

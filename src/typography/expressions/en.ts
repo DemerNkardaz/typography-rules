@@ -1,4 +1,4 @@
-import { PUNCTUATION, CHARACTERS } from '@/glyphs';
+import { PUNCTUATION, CHARACTERS } from '@nkardaz/typography-rules/glyphs';
 
 import { PARTS as COMMON_PARTS, EXPRESSIONS as COMMON_EXPRESSIONS } from './common';
 

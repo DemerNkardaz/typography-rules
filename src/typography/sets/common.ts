@@ -1,6 +1,13 @@
 import { newRule } from '@/api';
-import { clearSpaces, runt } from '@/functions';
-import { MATHS, DASHES, PUNCTUATION, CHARACTERS, NONE, SPACES } from '@/glyphs';
+import { clearSpaces, runt } from '@nkardaz/typography-rules/functions';
+import {
+	MATHS,
+	DASHES,
+	PUNCTUATION,
+	CHARACTERS,
+	NONE,
+	SPACES,
+} from '@nkardaz/typography-rules/glyphs';
 
 import EXPRESSIONS from '../expressions/common';
 

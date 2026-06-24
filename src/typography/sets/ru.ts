@@ -1,6 +1,14 @@
 import { newRule } from '@/api';
-import { smartNumberGrouping, smartQuotes, wrapWithTag } from '@/functions';
-import { CHARACTERS, DASHES, MATHS, NONE, PUNCTUATION, SPACES, WALLET } from '@/glyphs';
+import { smartNumberGrouping, smartQuotes, wrapWithTag } from '@nkardaz/typography-rules/functions';
+import {
+	CHARACTERS,
+	DASHES,
+	MATHS,
+	NONE,
+	PUNCTUATION,
+	SPACES,
+	WALLET,
+} from '@nkardaz/typography-rules/glyphs';
 
 import EXPRESSIONS from '../expressions/ru';
 

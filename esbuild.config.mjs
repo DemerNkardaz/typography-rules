@@ -5,32 +5,6 @@ import { writeFile } from 'node:fs/promises';
 
 await rm('dist', { recursive: true, force: true });
 
-const externalImportsPlugin = (format, relative = './') => ({
-	name: 'external-glyphs',
-	setup(build) {
-		build.onResolve({ filter: /.*/ }, (args) => {
-			if (args.importer && args.path.includes('/glyphs')) {
-				return {
-					path: relative + 'glyphs/index.mjs',
-					external: true,
-				};
-			}
-			if (args.importer && args.path.includes('/helpers')) {
-				return {
-					path: relative + 'helpers/index.mjs',
-					external: true,
-				};
-			}
-			if (args.importer && args.path.includes('/functions')) {
-				return {
-					path: relative,
-					external: true,
-				};
-			}
-		});
-	},
-});
-
 const common = {
 	bundle: true,
 	treeShaking: true,
@@ -39,6 +13,7 @@ const common = {
 	platform: 'neutral',
 	target: 'es2022',
 	tsconfig: 'tsconfig.build.json',
+	external: ['@nkardaz/typography-rules/*'],
 };
 
 await build({
@@ -54,7 +29,6 @@ const glyphsMJS = await build({
 	entryPoints: ['src/glyphs/index.ts'],
 	format: 'esm',
 	outfile: 'dist/glyphs/index.mjs',
-	plugins: [externalImportsPlugin('esm', '../')],
 });
 
 await writeFile('dist/glyphs/meta-esm.json', JSON.stringify(glyphsMJS.metafile));
@@ -64,7 +38,6 @@ const helpersMJS = await build({
 	entryPoints: ['src/helpers/index.ts'],
 	format: 'esm',
 	outfile: 'dist/helpers/index.mjs',
-	plugins: [externalImportsPlugin('esm', '../')],
 });
 
 await writeFile('dist/helpers/meta-esm.json', JSON.stringify(helpersMJS.metafile));
@@ -74,7 +47,6 @@ const functionsMJS = await build({
 	entryPoints: ['src/functions/index.ts'],
 	format: 'esm',
 	outfile: 'dist/functions/index.mjs',
-	plugins: [externalImportsPlugin('esm', '../')],
 });
 
 await writeFile('dist/functions/meta-esm.json', JSON.stringify(functionsMJS.metafile));
@@ -84,7 +56,6 @@ const resultMJS = await build({
 	entryPoints: ['src/index.ts'],
 	format: 'esm',
 	outfile: 'dist/index.mjs',
-	plugins: [externalImportsPlugin('esm')],
 });
 
 await writeFile('dist/meta-esm.json', JSON.stringify(resultMJS.metafile));

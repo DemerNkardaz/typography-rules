@@ -1,4 +1,4 @@
-import { SPACES } from '@/glyphs';
+import { SPACES } from '@nkardaz/typography-rules/glyphs';
 import type { ClearSpacesSettings } from '@/types';
 
 /**

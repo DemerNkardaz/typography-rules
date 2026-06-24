@@ -7,7 +7,7 @@ import {
 	CHARACTERS,
 	PUNCTUATION,
 	TEMPERATURES,
-} from '@/glyphs';
+} from '@nkardaz/typography-rules/glyphs';
 
 export const PARTS = {
 	numerals: '[' + RANGES.common.DIGITS.join('') + ']+',
